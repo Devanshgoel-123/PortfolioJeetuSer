@@ -1,0 +1,153 @@
+.admin-root {
+  min-height: 100vh;
+  background: #fafaf8;
+  color: #0d0d0d;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.admin-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(13, 13, 13, 0.09);
+}
+
+.admin-title {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0a1f4e;
+}
+
+.admin-card {
+  background: #fff;
+  border: 1px solid rgba(13, 13, 13, 0.09);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a7a72;
+  margin-bottom: 0.35rem;
+}
+
+.admin-input,
+.admin-textarea {
+  width: 100%;
+  border: 1px solid rgba(13, 13, 13, 0.12);
+  background: #fff;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+}
+
+.admin-textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+}
+
+.admin-btn-primary {
+  background: #0a1f4e;
+  color: #fff;
+}
+
+.admin-btn-secondary {
+  background: #f2f0eb;
+  color: #0d0d0d;
+}
+
+.admin-btn-danger {
+  background: #c03020;
+  color: #fff;
+}
+
+.admin-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid rgba(13, 13, 13, 0.09);
+}
+
+.admin-list-meta {
+  font-size: 0.82rem;
+  color: #7a7a72;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-video-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+.admin-note {
+  font-size: 0.85rem;
+  color: #7a7a72;
+  line-height: 1.6;
+}
+
+.admin-error {
+  color: #c03020;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .admin-shell {
+    padding: 2.5rem 2.5rem 5rem;
+  }
+
+  .admin-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}

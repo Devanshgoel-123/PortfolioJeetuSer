@@ -4,17 +4,20 @@ import { useState, useEffect } from "react";
 import {
   VARSHA_PHOTO,
   HERO_SLIDES,
-  WORK,
   NAV_LINKS,
   SERVICES,
   STATS,
   CONTACT_LINKS,
   FOOTER_LINKS,
-  yt,
-  ytUrl,
 } from "@/data/site";
+import { yt, ytUrl } from "@/lib/youtube";
+import type { DisplayProject } from "@/types/project";
 
-export default function HomePage() {
+type HomePageProps = {
+  projects: DisplayProject[];
+};
+
+export default function HomePage({ projects }: HomePageProps) {
   const [scrollY, setScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -325,14 +328,14 @@ export default function HomePage() {
         </div>
 
         <div>
-          {WORK.map((item, i) => (
+          {projects.map((item, i) => (
             <div key={item.id}>
               <div
                 className="mih-work-row"
                 onClick={() => setExpanded(expanded === item.id ? null : item.id)}
                 style={{
                   borderBottom:
-                    i === WORK.length - 1 && expanded !== item.id ? "1px solid var(--border)" : "none",
+                    i === projects.length - 1 && expanded !== item.id ? "1px solid var(--border)" : "none",
                 }}
               >
                 <div className="mih-work-row-inner">
