@@ -59,6 +59,7 @@ async function ensureAdmin(request: Request) {
   return isAdminAuthenticated();
 }
 
+// Get a project by id
 export async function GET(_request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
@@ -79,6 +80,7 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 }
 
+// Update a project
 export async function PUT(request: Request, context: RouteContext) {
   if (!(await ensureAdmin(request))) {
     return unauthorized();
