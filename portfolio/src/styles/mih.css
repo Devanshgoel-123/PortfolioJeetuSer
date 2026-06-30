@@ -2,6 +2,15 @@
   box-sizing: border-box;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
 @keyframes slideDown {
   from { transform: translateY(-100%); }
   to   { transform: translateY(100%); }
@@ -12,6 +21,7 @@
   color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -113,10 +123,11 @@
 
 .mih-hero {
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 var(--px) 3rem;
+  padding: 5rem var(--px) 4rem;
   position: relative;
   overflow: hidden;
 }
@@ -442,6 +453,8 @@
   color: var(--foreground);
   line-height: 1.1;
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .mih-work-meta {
@@ -748,8 +761,9 @@
 }
 
 .mih-hero-slide-label {
+  display: none;
   position: absolute;
-  bottom: 3.5rem;
+  top: 4.5rem;
   right: var(--px);
   z-index: 4;
   font-family: 'Barlow Condensed', sans-serif;
@@ -794,6 +808,10 @@
 .mih-grid-bl,
 .mih-grid-bc {
   min-height: 150px;
+}
+
+.mih-grid-bc {
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 640px) {
@@ -876,6 +894,10 @@
   .mih-grid-bl,
   .mih-grid-bc {
     height: auto !important;
+  }
+
+  .mih-hero-slide-label {
+    display: block;
   }
 
   .mih-about-grid {
