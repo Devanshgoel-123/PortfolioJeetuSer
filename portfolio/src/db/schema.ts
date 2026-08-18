@@ -6,6 +6,7 @@ export const projects = pgTable("projects", {
   client: text("client").notNull(),
   category: text("category").notNull(),
   year: text("year").notNull(),
+  kind: text("kind").notNull().default("film"),
   sortOrder: integer("sort_order").notNull().default(0),
   published: boolean("published").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -19,11 +20,23 @@ export const projectVideos = pgTable("project_videos", {
     .references(() => projects.id, { onDelete: "cascade" }),
   youtubeId: text("youtube_id").notNull(),
   label: text("label").notNull(),
+  thumbnail: text("thumbnail"),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+export const projectImages = pgTable("project_images", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  label: text("label").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
 export const projectsRelations = relations(projects, ({ many }) => ({
   videos: many(projectVideos),
+  images: many(projectImages),
 }));
 
 export const projectVideosRelations = relations(projectVideos, ({ one }) => ({
@@ -33,7 +46,16 @@ export const projectVideosRelations = relations(projectVideos, ({ one }) => ({
   }),
 }));
 
+export const projectImagesRelations = relations(projectImages, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectImages.projectId],
+    references: [projects.id],
+  }),
+}));
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type ProjectVideo = typeof projectVideos.$inferSelect;
 export type NewProjectVideo = typeof projectVideos.$inferInsert;
+export type ProjectImage = typeof projectImages.$inferSelect;
+export type NewProjectImage = typeof projectImages.$inferInsert;

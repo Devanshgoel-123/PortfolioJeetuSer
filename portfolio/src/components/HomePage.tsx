@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   VARSHA_PHOTO,
   HERO_SLIDES,
@@ -17,10 +17,255 @@ type HomePageProps = {
   projects: DisplayProject[];
 };
 
+function workKey(item: DisplayProject) {
+  return `${item.kind}-${item.id}`;
+}
+
+function PlusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ArrowUpRight() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path
+        d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+type LightboxItem = {
+  src: string;
+  label: string;
+};
+
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MediaLightbox({
+  item,
+  onClose,
+}: {
+  item: LightboxItem | null;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!item) return;
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [item, onClose]);
+
+  if (!item) return null;
+
+  return (
+    <div className="mih-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label="Image preview">
+      <button type="button" className="mih-lightbox-close" onClick={onClose} aria-label="Close preview">
+        <CloseIcon />
+      </button>
+      <figure className="mih-lightbox-figure" onClick={(event) => event.stopPropagation()}>
+        <img src={item.src} alt={item.label} />
+        {item.label ? <figcaption className="mih-lightbox-caption">{item.label}</figcaption> : null}
+      </figure>
+    </div>
+  );
+}
+
+function PosterCarousel({
+  images,
+  onPreview,
+}: {
+  images: DisplayProject["images"];
+  onPreview: (item: LightboxItem) => void;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  function scrollTrack(direction: -1 | 1) {
+    const track = trackRef.current;
+    const first = track?.querySelector(".mih-poster-item") as HTMLElement | null;
+    track?.scrollBy({ left: direction * (first ? first.offsetWidth + 10 : 180), behavior: "smooth" });
+  }
+
+  return (
+    <div className="mih-poster-panel">
+      <div className="mih-poster-section">
+        <div className="mih-poster-header">
+          <span className="mih-poster-header-label">Campaign Posters</span>
+          <div className="mih-poster-nav">
+            <button
+              type="button"
+              className="mih-poster-btn"
+              aria-label="Previous"
+              onClick={(event) => {
+                event.stopPropagation();
+                scrollTrack(-1);
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path
+                  d="M13 7H1M6 2L1 7l5 5"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="mih-poster-btn"
+              aria-label="Next"
+              onClick={(event) => {
+                event.stopPropagation();
+                scrollTrack(1);
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path
+                  d="M1 7h12M8 2l5 5-5 5"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className="mih-poster-track" ref={trackRef}>
+          {images.map((image) => (
+            <button
+              key={`${image.url}-${image.label}`}
+              type="button"
+              className="mih-poster-item"
+              onClick={() => onPreview({ src: image.url, label: image.label })}
+            >
+              <img src={image.url} alt={image.label} />
+              <div className="mih-poster-overlay">
+                <span className="mih-poster-label">{image.label}</span>
+                <span className="mih-poster-watch">
+                  View <ArrowUpRight />
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorkAccordion({
+  items,
+  variant,
+  expanded,
+  onToggle,
+  onPreview,
+}: {
+  items: DisplayProject[];
+  variant: "film" | "print";
+  expanded: Record<string, boolean>;
+  onToggle: (key: string) => void;
+  onPreview: (item: LightboxItem) => void;
+}) {
+  return (
+    <div>
+      {items.map((item, i) => {
+        const key = workKey(item);
+        const isOpen = Boolean(expanded[key]);
+        const isLast = i === items.length - 1;
+
+        return (
+          <div key={key}>
+            <div
+              className={`mih-work-row${isOpen ? " expanded" : ""}${isLast ? " mih-work-row-last" : ""}`}
+              onClick={() => onToggle(key)}
+            >
+              <div className="mih-work-row-inner">
+                <div className="mih-work-row-top">
+                  <span className="mih-work-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mih-work-client">{item.client}</span>
+                  <div className="mih-work-meta">
+                    <span className="mih-work-year">{item.year}</span>
+                    <span className="mih-work-toggle">
+                      <PlusIcon />
+                    </span>
+                  </div>
+                </div>
+                <span className="mih-work-cat">{item.category}</span>
+              </div>
+            </div>
+
+            {isOpen &&
+              (variant === "print" ? (
+                <PosterCarousel images={item.images} onPreview={onPreview} />
+              ) : (
+                <div className="mih-films-panel">
+                  {item.videos.map(({ id, label, thumb }) => {
+                    const previewSrc = thumb || yt(id);
+                    return (
+                      <div key={id} className="mih-video-card">
+                        <button
+                          type="button"
+                          className="mih-video-thumb"
+                          onClick={() => onPreview({ src: previewSrc, label })}
+                          aria-label={`Preview ${label}`}
+                        >
+                          <img src={previewSrc} alt={label} />
+                        </button>
+                        <div className="mih-video-meta">
+                          <span className="mih-video-label">{label}</span>
+                          <a
+                            href={ytUrl(id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mih-video-watch"
+                          >
+                            Watch <ArrowUpRight />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function HomePage({ projects }: HomePageProps) {
   const [scrollY, setScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
+  const closeLightbox = useCallback(() => setLightbox(null), []);
   const [heroSlide, setHeroSlide] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
 
@@ -312,79 +557,36 @@ export default function HomePage({ projects }: HomePageProps) {
 
       <section id="work" className="mih-section">
         <div className="mih-section-header">
-          <h2 className="mih-section-h2">
-            Selected
-            <br />
-            Work
-          </h2>
+          <h2 className="mih-section-h2">Films</h2>
           <a
             href="https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s"
             target="_blank"
             rel="noopener noreferrer"
             className="mih-showreel-link"
           >
-            Full showreel ↗
+            Full showreel
+            <ArrowUpRight />
           </a>
         </div>
+        <WorkAccordion
+          items={projects.filter((project) => project.kind !== "print")}
+          variant="film"
+          expanded={expanded}
+          onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
+          onPreview={setLightbox}
+        />
 
-        <div>
-          {projects.map((item, i) => (
-            <div key={item.id}>
-              <div
-                className="mih-work-row"
-                onClick={() => setExpanded(expanded === item.id ? null : item.id)}
-                style={{
-                  borderBottom:
-                    i === projects.length - 1 && expanded !== item.id ? "1px solid var(--border)" : "none",
-                }}
-              >
-                <div className="mih-work-row-inner">
-                  <div className="mih-work-row-top">
-                    <span className="mih-work-num">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="mih-work-client">{item.client}</span>
-                    <div className="mih-work-meta">
-                      <span className="mih-work-year">{item.year}</span>
-                      <span
-                        className="mih-work-toggle"
-                        style={{ transform: expanded === item.id ? "rotate(45deg)" : "rotate(0deg)" }}
-                      >
-                        +
-                      </span>
-                    </div>
-                  </div>
-                  <span
-                    className="mih-work-cat"
-                    style={{ color: expanded === item.id ? "var(--accent)" : "var(--muted-foreground)" }}
-                  >
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-
-              {expanded === item.id && (
-                <div className="mih-work-expanded">
-                  {item.videos.map(({ id, label }) => (
-                    <a
-                      key={id}
-                      href={ytUrl(id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mih-video-card"
-                    >
-                      <div className="mih-video-thumb">
-                        <img src={yt(id)} alt={label} />
-                      </div>
-                      <div className="mih-video-meta">
-                        <span className="mih-video-label">{label}</span>
-                        <span className="mih-video-watch">Watch ↗</span>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="mih-section-header mih-print-heading">
+          <h2 className="mih-section-h2">Print</h2>
+          <p className="mih-print-blurb">Campaign posters and print visuals.</p>
         </div>
+        <WorkAccordion
+          items={projects.filter((project) => project.kind === "print")}
+          variant="print"
+          expanded={expanded}
+          onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
+          onPreview={setLightbox}
+        />
       </section>
 
       <section id="services" className="mih-section-bg">
@@ -480,6 +682,7 @@ export default function HomePage({ projects }: HomePageProps) {
         </div>
         <p className="mih-footer-copy">© 2026 Make It Here</p>
       </footer>
+      <MediaLightbox item={lightbox} onClose={closeLightbox} />
     </div>
   );
 }

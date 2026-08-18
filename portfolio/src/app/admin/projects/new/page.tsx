@@ -17,7 +17,7 @@ export default async function NewProjectPage() {
         <header className="admin-header">
           <div>
             <h1 className="admin-title">New Project</h1>
-            <p className="admin-note">Add a client project with one or more YouTube videos.</p>
+            <p className="admin-note">Choose Film or Print, then add videos or images.</p>
           </div>
           <Link href="/admin" className="admin-btn admin-btn-secondary">
             Back

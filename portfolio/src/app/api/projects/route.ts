@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated, verifyAdminRequest } from "@/lib/auth";
+import { isMediaUrl } from "@/lib/media";
 import { createProject, listAllProjects, listPublishedProjects } from "@/lib/projects";
 import { extractYoutubeId } from "@/lib/youtube";
 import type { ProjectInput } from "@/types/project";
+import { isWorkKind } from "@/types/project";
 
 function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,8 +17,9 @@ function parseProjectBody(body: unknown): ProjectInput | null {
   const client = typeof data.client === "string" ? data.client.trim() : "";
   const category = typeof data.category === "string" ? data.category.trim() : "";
   const year = typeof data.year === "string" ? data.year.trim() : "";
+  const kindValue = typeof data.kind === "string" ? data.kind.trim() : "film";
 
-  if (!client || !category || !year) return null;
+  if (!client || !category || !year || !isWorkKind(kindValue)) return null;
 
   const videosInput = Array.isArray(data.videos) ? data.videos : [];
   const videos = videosInput
@@ -31,22 +34,42 @@ function parseProjectBody(body: unknown): ProjectInput | null {
             : "";
       const youtubeId = extractYoutubeId(rawId);
       const label = typeof item.label === "string" ? item.label.trim() : "";
+      const thumbnail = typeof item.thumbnail === "string" ? item.thumbnail.trim() : "";
       if (!youtubeId || !label) return null;
       return {
         youtubeId,
         label,
+        thumbnail: isMediaUrl(thumbnail) ? thumbnail : undefined,
         sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index,
       };
     })
     .filter((video): video is NonNullable<typeof video> => video !== null);
 
+  const imagesInput = Array.isArray(data.images) ? data.images : [];
+  const images = imagesInput
+    .map((image, index) => {
+      if (!image || typeof image !== "object") return null;
+      const item = image as Record<string, unknown>;
+      const url = typeof item.url === "string" ? item.url.trim() : "";
+      const label = typeof item.label === "string" ? item.label.trim() : "";
+      if (!isMediaUrl(url)) return null;
+      return {
+        url,
+        label: label || `Image ${index + 1}`,
+        sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index,
+      };
+    })
+    .filter((image): image is NonNullable<typeof image> => image !== null);
+
   return {
     client,
     category,
     year,
+    kind: kindValue,
     sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : 0,
     published: typeof data.published === "boolean" ? data.published : true,
-    videos,
+    videos: kindValue === "film" ? videos : [],
+    images: kindValue === "print" ? images : [],
   };
 }
 

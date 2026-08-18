@@ -9,7 +9,7 @@ export default function AdminDashboard({ projects }: { projects: AdminProject[] 
       <header className="admin-header">
         <div>
           <h1 className="admin-title">Project Admin</h1>
-          <p className="admin-note">Manage the projects shown in the Selected Work section.</p>
+          <p className="admin-note">Manage Film and Print projects shown under Work.</p>
         </div>
         <div className="admin-actions">
           <Link href="/admin/projects/new" className="admin-btn admin-btn-primary">
@@ -25,7 +25,7 @@ export default function AdminDashboard({ projects }: { projects: AdminProject[] 
 
       {projects.length === 0 ? (
         <div className="admin-card">
-          <p className="admin-note">No projects yet. Create your first one to populate the website.</p>
+          <p className="admin-note">No projects yet. Create your first Film or Print project.</p>
         </div>
       ) : (
         <div className="admin-list">
@@ -34,7 +34,10 @@ export default function AdminDashboard({ projects }: { projects: AdminProject[] 
               <div>
                 <strong>{project.client}</strong>
                 <div className="admin-list-meta">
-                  {project.category} · {project.year} · {project.videos.length} videos
+                  {project.kind === "film" ? "Film" : "Print"} · {project.category} · {project.year} ·{" "}
+                  {project.kind === "print"
+                    ? `${project.images.length} images`
+                    : `${project.videos.length} videos`}
                   {!project.published && " · Hidden"}
                 </div>
               </div>

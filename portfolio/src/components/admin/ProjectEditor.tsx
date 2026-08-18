@@ -3,9 +3,17 @@
 import { useState } from "react";
 import type { AdminProject } from "@/app/admin/actions";
 import { deleteProjectAction, saveProjectAction } from "@/app/admin/actions";
+import { extractYoutubeId, yt } from "@/lib/youtube";
+import type { WorkKind } from "@/types/project";
 
 type VideoField = {
   youtubeId: string;
+  label: string;
+  thumbnail: string;
+};
+
+type ImageField = {
+  url: string;
   label: string;
 };
 
@@ -14,17 +22,37 @@ type ProjectEditorProps = {
 };
 
 function emptyVideo(): VideoField {
-  return { youtubeId: "", label: "" };
+  return { youtubeId: "", label: "", thumbnail: "" };
+}
+
+function emptyImage(): ImageField {
+  return { url: "", label: "" };
+}
+
+function videoPreviewSrc(video: VideoField): string | null {
+  if (video.thumbnail.trim()) return video.thumbnail.trim();
+  const id = extractYoutubeId(video.youtubeId);
+  return id ? yt(id) : null;
 }
 
 export default function ProjectEditor({ project }: ProjectEditorProps) {
+  const [kind, setKind] = useState<WorkKind>(project?.kind ?? "film");
   const [videos, setVideos] = useState<VideoField[]>(
     project?.videos.length
       ? project.videos.map((video) => ({
           youtubeId: video.youtubeId,
           label: video.label,
+          thumbnail: video.thumbnail ?? "",
         }))
-      : [emptyVideo(), emptyVideo()],
+      : [emptyVideo()],
+  );
+  const [images, setImages] = useState<ImageField[]>(
+    project?.images.length
+      ? project.images.map((image) => ({
+          url: image.url,
+          label: image.label,
+        }))
+      : [emptyImage()],
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -35,12 +63,10 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
     );
   }
 
-  function addVideo() {
-    setVideos((current) => [...current, emptyVideo()]);
-  }
-
-  function removeVideo(index: number) {
-    setVideos((current) => current.filter((_, i) => i !== index));
+  function updateImage(index: number, field: keyof ImageField, value: string) {
+    setImages((current) =>
+      current.map((image, i) => (i === index ? { ...image, [field]: value } : image)),
+    );
   }
 
   async function handleSubmit(formData: FormData) {
@@ -56,6 +82,32 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
   return (
     <form action={handleSubmit} className="admin-card">
       {project && <input type="hidden" name="projectId" value={project.id} />}
+      <input type="hidden" name="kind" value={kind} />
+
+      <div className="admin-kind-block">
+        <p className="admin-label">Work type</p>
+        <div className="admin-kind-toggle">
+          <button
+            type="button"
+            className={`admin-kind-option${kind === "film" ? " is-active" : ""}`}
+            onClick={() => setKind("film")}
+          >
+            Film
+          </button>
+          <button
+            type="button"
+            className={`admin-kind-option${kind === "print" ? " is-active" : ""}`}
+            onClick={() => setKind("print")}
+          >
+            Print
+          </button>
+        </div>
+        <p className="admin-note">
+          {kind === "film"
+            ? "Film projects use YouTube videos, each with an optional custom thumbnail."
+            : "Print projects use a gallery of images instead of videos."}
+        </p>
+      </div>
 
       <div className="admin-grid admin-grid-2">
         <div>
@@ -79,6 +131,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
             name="category"
             className="admin-input"
             defaultValue={project?.category ?? ""}
+            placeholder={kind === "film" ? "Content Production" : "Editorial"}
             required
           />
         </div>
@@ -113,49 +166,134 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
         <span className="admin-note">Published on website</span>
       </label>
 
-      <div style={{ marginTop: "1.5rem" }}>
-        <div className="admin-header" style={{ marginBottom: "1rem", paddingBottom: 0, border: "none" }}>
-          <h2 className="admin-title" style={{ fontSize: "1rem" }}>
-            Videos
-          </h2>
-          <button type="button" className="admin-btn admin-btn-secondary" onClick={addVideo}>
-            Add video
-          </button>
-        </div>
-
-        {videos.map((video, index) => (
-          <div key={index} className="admin-video-row">
-            <div>
-              <label className="admin-label">YouTube URL or ID</label>
-              <input
-                name="videoYoutubeId"
-                className="admin-input"
-                value={video.youtubeId}
-                onChange={(event) => updateVideo(index, "youtubeId", event.target.value)}
-                placeholder="RAdw_jCDAjs or full YouTube URL"
-              />
-            </div>
-            <div>
-              <label className="admin-label">Label</label>
-              <input
-                name="videoLabel"
-                className="admin-input"
-                value={video.label}
-                onChange={(event) => updateVideo(index, "label", event.target.value)}
-                placeholder="Campaign Film"
-              />
-            </div>
+      {kind === "film" ? (
+        <div style={{ marginTop: "1.5rem" }}>
+          <div className="admin-header" style={{ marginBottom: "1rem", paddingBottom: 0, border: "none" }}>
+            <h2 className="admin-title" style={{ fontSize: "1rem" }}>
+              Videos
+            </h2>
             <button
               type="button"
               className="admin-btn admin-btn-secondary"
-              onClick={() => removeVideo(index)}
-              disabled={videos.length === 1}
+              onClick={() => setVideos((current) => [...current, emptyVideo()])}
             >
-              Remove
+              Add video
             </button>
           </div>
-        ))}
-      </div>
+
+          {videos.map((video, index) => {
+            const preview = videoPreviewSrc(video);
+            return (
+              <div key={index} className="admin-media-row">
+                <div className="admin-media-preview">
+                  {preview ? (
+                    <img src={preview} alt={video.label || "Video thumbnail"} />
+                  ) : (
+                    <span>Thumbnail</span>
+                  )}
+                </div>
+                <div className="admin-media-fields">
+                  <div>
+                    <label className="admin-label">YouTube URL or ID</label>
+                    <input
+                      name="videoYoutubeId"
+                      className="admin-input"
+                      value={video.youtubeId}
+                      onChange={(event) => updateVideo(index, "youtubeId", event.target.value)}
+                      placeholder="RAdw_jCDAjs or full YouTube URL"
+                    />
+                  </div>
+                  <div>
+                    <label className="admin-label">Label</label>
+                    <input
+                      name="videoLabel"
+                      className="admin-input"
+                      value={video.label}
+                      onChange={(event) => updateVideo(index, "label", event.target.value)}
+                      placeholder="Campaign Film"
+                    />
+                  </div>
+                  <div className="admin-media-span">
+                    <label className="admin-label">Thumbnail URL (optional)</label>
+                    <input
+                      name="videoThumbnail"
+                      className="admin-input"
+                      value={video.thumbnail}
+                      onChange={(event) => updateVideo(index, "thumbnail", event.target.value)}
+                      placeholder="Leave blank to use the YouTube thumbnail"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-secondary"
+                  onClick={() => setVideos((current) => current.filter((_, i) => i !== index))}
+                  disabled={videos.length === 1}
+                >
+                  Remove
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ marginTop: "1.5rem" }}>
+          <div className="admin-header" style={{ marginBottom: "1rem", paddingBottom: 0, border: "none" }}>
+            <h2 className="admin-title" style={{ fontSize: "1rem" }}>
+              Images
+            </h2>
+            <button
+              type="button"
+              className="admin-btn admin-btn-secondary"
+              onClick={() => setImages((current) => [...current, emptyImage()])}
+            >
+              Add image
+            </button>
+          </div>
+
+          {images.map((image, index) => (
+            <div key={index} className="admin-media-row">
+              <div className="admin-media-preview">
+                {image.url.trim() ? (
+                  <img src={image.url} alt={image.label || "Print image"} />
+                ) : (
+                  <span>Image</span>
+                )}
+              </div>
+              <div className="admin-media-fields">
+                <div className="admin-media-span">
+                  <label className="admin-label">Image URL</label>
+                  <input
+                    name="imageUrl"
+                    className="admin-input"
+                    value={image.url}
+                    onChange={(event) => updateImage(index, "url", event.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="admin-media-span">
+                  <label className="admin-label">Label</label>
+                  <input
+                    name="imageLabel"
+                    className="admin-input"
+                    value={image.label}
+                    onChange={(event) => updateImage(index, "label", event.target.value)}
+                    placeholder="Cover, Spread 01..."
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={() => setImages((current) => current.filter((_, i) => i !== index))}
+                disabled={images.length === 1}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="admin-actions" style={{ marginTop: "1.5rem" }}>
         <button type="submit" className="admin-btn admin-btn-primary" disabled={pending}>

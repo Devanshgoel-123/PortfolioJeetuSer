@@ -5,6 +5,7 @@ export const SEED_PROJECTS: ProjectInput[] = [
     client: "Beauty & Lifestyle",
     category: "Content Production",
     year: "2024–26",
+    kind: "film",
     sortOrder: 1,
     videos: [
       { youtubeId: "RAdw_jCDAjs", label: "Campaign Film" },
@@ -12,11 +13,13 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "FX59-ZT6Ui0", label: "Product Reveal" },
       { youtubeId: "b0pexzGB44o", label: "Social Series" },
     ],
+    images: [],
   },
   {
     client: "ICICI Bank",
     category: "Finance & Banking",
     year: "2024–25",
+    kind: "film",
     sortOrder: 2,
     videos: [
       { youtubeId: "Q7cLYdVysyY", label: "Brand Film" },
@@ -24,22 +27,26 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "Ii8dR35JkaM", label: "Product Spot" },
       { youtubeId: "mnBVv4oFfWE", label: "Digital Series" },
     ],
+    images: [],
   },
   {
     client: "Hubble Money",
     category: "Fintech",
     year: "2024",
+    kind: "film",
     sortOrder: 3,
     videos: [
       { youtubeId: "3SLDmRjx7Og", label: "Launch Film" },
       { youtubeId: "1iQSwtQmlig", label: "Explainer" },
       { youtubeId: "QCnjsjbrA-o", label: "Campaign Spot" },
     ],
+    images: [],
   },
   {
     client: "Manipal Healthcare",
     category: "Healthcare",
     year: "2023–24",
+    kind: "film",
     sortOrder: 4,
     videos: [
       { youtubeId: "cd_RtZ0KuIw", label: "Brand Film" },
@@ -47,11 +54,13 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "TF_E1MaqwIs", label: "Documentary" },
       { youtubeId: "RsKaNypd3lw", label: "Series" },
     ],
+    images: [],
   },
   {
     client: "Healthcare",
     category: "Health & Wellness",
     year: "2023–25",
+    kind: "film",
     sortOrder: 5,
     videos: [
       { youtubeId: "53QAAPOHCXo", label: "Awareness Film" },
@@ -60,11 +69,13 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "sCeCuH847ss", label: "Brand Spot" },
       { youtubeId: "T0DCpH47iPk", label: "Social Content" },
     ],
+    images: [],
   },
   {
     client: "Foods",
     category: "FMCG & Food",
     year: "2023–24",
+    kind: "film",
     sortOrder: 6,
     videos: [
       { youtubeId: "KCcEEo3-8QA", label: "Brand Film" },
@@ -72,11 +83,13 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "twU7wpILnHc", label: "Recipe Series" },
       { youtubeId: "4kpsuvB9jpM", label: "Campaign" },
     ],
+    images: [],
   },
   {
     client: "Pro-bono",
     category: "Social Impact",
     year: "Ongoing",
+    kind: "film",
     sortOrder: 7,
     videos: [
       { youtubeId: "d_irGzgCALc", label: "Impact Film" },
@@ -86,5 +99,6 @@ export const SEED_PROJECTS: ProjectInput[] = [
       { youtubeId: "VRWeEzaA-vs", label: "Community Story" },
       { youtubeId: "yw1TYFY6vzg", label: "Short Film" },
     ],
+    images: [],
   },
 ];

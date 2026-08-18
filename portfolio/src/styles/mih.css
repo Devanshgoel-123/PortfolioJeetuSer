@@ -410,6 +410,20 @@ img {
   margin-top: 0.25rem;
 }
 
+.mih-print-heading {
+  margin-top: 5rem;
+}
+
+.mih-print-blurb {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.82rem;
+  color: var(--muted-foreground);
+  max-width: 220px;
+  line-height: 1.65;
+  margin: 0;
+}
+
 .mih-work-row {
   border-top: 1px solid var(--border);
   padding: 1.25rem 0;
@@ -419,6 +433,10 @@ img {
 
 .mih-work-row:hover {
   background-color: var(--muted);
+}
+
+.mih-work-row-last {
+  border-bottom: 1px solid var(--border);
 }
 
 .mih-work-row-inner {
@@ -472,13 +490,20 @@ img {
 }
 
 .mih-work-toggle {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1rem;
   color: var(--muted-foreground);
-  transition: transform 0.2s;
-  line-height: 1;
-  width: 16px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.mih-work-toggle svg {
+  transition: transform 0.25s ease;
+}
+
+.mih-work-row.expanded .mih-work-toggle svg {
+  transform: rotate(45deg);
 }
 
 .mih-work-cat {
@@ -491,7 +516,11 @@ img {
   transition: color 0.2s;
 }
 
-.mih-work-expanded {
+.mih-work-row.expanded .mih-work-cat {
+  color: var(--accent);
+}
+
+.mih-films-panel {
   padding: 1.25rem;
   background-color: var(--muted);
   display: grid;
@@ -511,6 +540,11 @@ img {
   aspect-ratio: 16/9;
   overflow: hidden;
   background-color: var(--card);
+  border: none;
+  padding: 0;
+  display: block;
+  width: 100%;
+  cursor: pointer;
 }
 
 .mih-video-thumb img {
@@ -549,6 +583,201 @@ img {
   text-transform: uppercase;
   color: var(--accent);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+}
+
+.mih-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(13, 13, 13, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5rem 1.25rem 1.25rem;
+}
+
+.mih-lightbox-close {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(13, 13, 13, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 81;
+}
+
+.mih-lightbox-close:hover {
+  background: #fff;
+  color: #0d0d0d;
+  border-color: #fff;
+}
+
+.mih-lightbox-figure {
+  margin: 0;
+  max-width: min(1100px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.mih-lightbox-figure img {
+  max-width: 100%;
+  max-height: calc(100vh - 8rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.mih-lightbox-caption {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+.mih-poster-panel {
+  border-bottom: 1px solid var(--border);
+}
+
+.mih-poster-section {
+  padding: 1.25rem 1.25rem 0;
+  background-color: var(--muted);
+}
+
+.mih-poster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.mih-poster-header-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 400;
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.mih-poster-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.mih-poster-btn {
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.mih-poster-btn:hover {
+  background-color: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
+}
+
+.mih-poster-track {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 1.5rem;
+}
+
+.mih-poster-track::-webkit-scrollbar {
+  display: none;
+}
+
+.mih-poster-item {
+  flex: 0 0 calc(50% - 5px);
+  scroll-snap-align: start;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  display: block;
+  background-color: var(--card);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.mih-poster-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(30%);
+  transition: transform 0.5s ease, filter 0.35s;
+}
+
+.mih-poster-item:hover img {
+  transform: scale(1.06);
+  filter: grayscale(0%);
+}
+
+.mih-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0.85rem 0.9rem;
+  pointer-events: none;
+}
+
+.mih-poster-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.mih-poster-watch {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 400;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .mih-services-grid {
@@ -753,6 +982,9 @@ img {
   text-decoration: none;
   transition: color 0.2s, border-color 0.2s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .mih-showreel-link:hover {
@@ -918,8 +1150,12 @@ img {
     gap: 2rem;
   }
 
-  .mih-work-expanded {
+  .mih-films-panel {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mih-poster-item {
+    flex: 0 0 calc(33.333% - 7px);
   }
 
   .mih-contact-top {
@@ -958,8 +1194,12 @@ img {
     padding: 7rem var(--px);
   }
 
-  .mih-work-expanded {
+  .mih-films-panel {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .mih-poster-item {
+    flex: 0 0 calc(25% - 8px);
   }
 
   .mih-services-grid {

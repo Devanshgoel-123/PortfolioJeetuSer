@@ -33,12 +33,19 @@ export default async function EditProjectPage({ params }: PageProps) {
     client: project.client,
     category: project.category,
     year: project.year,
+    kind: project.kind === "print" ? "print" : "film",
     sortOrder: project.sortOrder,
     published: project.published,
     videos: project.videos.map((video) => ({
       youtubeId: video.youtubeId,
       label: video.label,
+      thumbnail: video.thumbnail ?? "",
       sortOrder: video.sortOrder,
+    })),
+    images: project.images.map((image) => ({
+      url: image.url,
+      label: image.label,
+      sortOrder: image.sortOrder,
     })),
   };
 
