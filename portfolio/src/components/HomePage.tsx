@@ -23,8 +23,19 @@ function workKey(item: DisplayProject) {
 
 function PlusIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M7 1v12M1 7h12"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -52,8 +63,9 @@ function ArrowUpRight() {
 }
 
 type LightboxItem = {
-  src: string;
   label: string;
+  src?: string;
+  youtubeId?: string;
 };
 
 type LightboxState = {
@@ -63,24 +75,59 @@ type LightboxState = {
 
 function CloseIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 4l10 10M14 4L4 14"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
 function ChevronLeft() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M12 3L6 9l6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 3L6 9l6 6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function ChevronRight() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M6 3l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 3l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -101,7 +148,8 @@ function MediaLightbox({
   const goTo = useCallback(
     (direction: -1 | 1) => {
       if (!state || state.items.length < 2) return;
-      const next = (state.index + direction + state.items.length) % state.items.length;
+      const next =
+        (state.index + direction + state.items.length) % state.items.length;
       onIndexChange(next);
     },
     [onIndexChange, state],
@@ -129,8 +177,19 @@ function MediaLightbox({
   if (!item || !state) return null;
 
   return (
-    <div className="mih-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label="Image preview">
-      <button type="button" className="mih-lightbox-close" onClick={onClose} aria-label="Close preview">
+    <div
+      className="mih-lightbox"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.youtubeId ? "YouTube video" : "Image preview"}
+    >
+      <button
+        type="button"
+        className="mih-lightbox-close"
+        onClick={onClose}
+        aria-label="Close preview"
+      >
         <CloseIcon />
       </button>
       {canNavigate ? (
@@ -141,7 +200,7 @@ function MediaLightbox({
             event.stopPropagation();
             goTo(-1);
           }}
-          aria-label="Previous image"
+          aria-label={item.youtubeId ? "Previous video" : "Previous image"}
         >
           <ChevronLeft />
         </button>
@@ -154,13 +213,28 @@ function MediaLightbox({
             event.stopPropagation();
             goTo(1);
           }}
-          aria-label="Next image"
+          aria-label={item.youtubeId ? "Next video" : "Next image"}
         >
           <ChevronRight />
         </button>
       ) : null}
-      <figure className="mih-lightbox-figure" onClick={(event) => event.stopPropagation()}>
-        <img src={item.src} alt={item.label} />
+      <figure
+        className={`mih-lightbox-figure${item.youtubeId ? " is-video" : ""}`}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {item.youtubeId ? (
+          <div className="mih-lightbox-video">
+            <iframe
+              key={item.youtubeId}
+              src={`https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&rel=0`}
+              title={item.label}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <img src={item.src} alt={item.label} />
+        )}
         <figcaption className="mih-lightbox-caption">
           {item.label}
           {canNavigate ? `  ·  ${state.index + 1} / ${count}` : ""}
@@ -181,8 +255,13 @@ function PosterCarousel({
 
   function scrollTrack(direction: -1 | 1) {
     const track = trackRef.current;
-    const first = track?.querySelector(".mih-poster-item") as HTMLElement | null;
-    track?.scrollBy({ left: direction * (first ? first.offsetWidth + 10 : 180), behavior: "smooth" });
+    const first = track?.querySelector(
+      ".mih-poster-item",
+    ) as HTMLElement | null;
+    track?.scrollBy({
+      left: direction * (first ? first.offsetWidth + 10 : 180),
+      behavior: "smooth",
+    });
   }
 
   return (
@@ -200,7 +279,13 @@ function PosterCarousel({
                 scrollTrack(-1);
               }}
             >
-              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden="true"
+              >
                 <path
                   d="M13 7H1M6 2L1 7l5 5"
                   stroke="currentColor"
@@ -219,7 +304,13 @@ function PosterCarousel({
                 scrollTrack(1);
               }}
             >
-              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden="true"
+              >
                 <path
                   d="M1 7h12M8 2l5 5-5 5"
                   stroke="currentColor"
@@ -239,7 +330,10 @@ function PosterCarousel({
               className="mih-poster-item"
               onClick={() =>
                 onPreview(
-                  images.map((entry) => ({ src: entry.url, label: entry.label })),
+                  images.map((entry) => ({
+                    src: entry.url,
+                    label: entry.label,
+                  })),
                   index,
                 )
               }
@@ -287,7 +381,9 @@ function WorkAccordion({
             >
               <div className="mih-work-row-inner">
                 <div className="mih-work-row-top">
-                  <span className="mih-work-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mih-work-num">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   <span className="mih-work-client">{item.client}</span>
                   <div className="mih-work-meta">
                     <span className="mih-work-year">{item.year}</span>
@@ -315,26 +411,33 @@ function WorkAccordion({
                           onClick={() =>
                             onPreview(
                               item.videos.map((video) => ({
-                                src: video.thumb || yt(video.id),
+                                youtubeId: video.id,
                                 label: video.label,
                               })),
                               videoIndex,
                             )
                           }
-                          aria-label={`Preview ${label}`}
+                          aria-label={`Play ${label}`}
                         >
                           <img src={previewSrc} alt={label} />
                         </button>
                         <div className="mih-video-meta">
                           <span className="mih-video-label">{label}</span>
-                          <a
-                            href={ytUrl(id)}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
                             className="mih-video-watch"
+                            onClick={() =>
+                              onPreview(
+                                item.videos.map((video) => ({
+                                  youtubeId: video.id,
+                                  label: video.label,
+                                })),
+                                videoIndex,
+                              )
+                            }
                           >
                             Watch <ArrowUpRight />
-                          </a>
+                          </button>
                         </div>
                       </div>
                     );
@@ -409,7 +512,10 @@ export default function HomePage({ projects }: HomePageProps) {
           ))}
         </div>
 
-        <a href="mailto:makeitherebyvarsha@gmail.com" className="mih-nav-link mih-nav-email">
+        <a
+          href="mailto:makeitherebyvarsha@gmail.com"
+          className="mih-nav-link mih-nav-email"
+        >
           makeitherebyvarsha@gmail.com
         </a>
 
@@ -418,9 +524,21 @@ export default function HomePage({ projects }: HomePageProps) {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
-          <span style={{ transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }} />
+          <span
+            style={{
+              transform: menuOpen
+                ? "rotate(45deg) translate(4px, 4px)"
+                : "none",
+            }}
+          />
           <span style={{ transform: menuOpen ? "scaleX(0)" : "none" }} />
-          <span style={{ transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }} />
+          <span
+            style={{
+              transform: menuOpen
+                ? "rotate(-45deg) translate(4px, -4px)"
+                : "none",
+            }}
+          />
         </button>
       </nav>
 
@@ -459,7 +577,10 @@ export default function HomePage({ projects }: HomePageProps) {
         ))}
 
         {HERO_SLIDES[heroSlide].label && (
-          <div className="mih-hero-slide-label" style={{ opacity: heroFading ? 0 : 1 }}>
+          <div
+            className="mih-hero-slide-label"
+            style={{ opacity: heroFading ? 0 : 1 }}
+          >
             {HERO_SLIDES[heroSlide].label}
           </div>
         )}
@@ -472,7 +593,8 @@ export default function HomePage({ projects }: HomePageProps) {
               className="mih-hero-dot"
               style={{
                 width: i === heroSlide ? "20px" : "6px",
-                backgroundColor: i === heroSlide ? "var(--accent)" : "var(--border)",
+                backgroundColor:
+                  i === heroSlide ? "var(--accent)" : "var(--border)",
               }}
               aria-label={`Slide ${i + 1}`}
             />
@@ -483,17 +605,19 @@ export default function HomePage({ projects }: HomePageProps) {
         <div className="mih-hero-watermark">26</div>
 
         <div className="mih-hero-content">
-          <h1 className="mih-hero-h1" style={{ color: "var(--brand)" }}>
-            Make It
-            <br />
-            <span style={{ color: "var(--accent)" }}>Here.</span>
-          </h1>
-
-          <div className="mih-hero-body">
-            <p className="mih-hero-p">
-              Video content studio by Varsha — creating brand films, campaigns, and stories for
-              India&apos;s most ambitious companies across beauty, finance, healthcare, and food.
-            </p>
+          <div className="mih-hero-main">
+            <div className="mih-hero-copy">
+              <h1 className="mih-hero-h1" style={{ color: "var(--brand)" }}>
+                Make It
+                <br />
+                <span style={{ color: "var(--accent)" }}>Here.</span>
+              </h1>
+              <p className="mih-hero-p">
+                Video content studio by Varsha, creating brand films, campaigns,
+                and stories for India&apos;s most ambitious companies across
+                beauty, finance, healthcare, and food.
+              </p>
+            </div>
             <div className="mih-hero-actions">
               <a href="#work" className="mih-btn-outline">
                 View Work
@@ -550,7 +674,11 @@ export default function HomePage({ projects }: HomePageProps) {
           rel="noopener noreferrer"
           className="mih-grid-cell mih-grid-main"
         >
-          <img src={yt("RAdw_jCDAjs")} alt="Beauty & Lifestyle" style={{ filter: "grayscale(50%)" }} />
+          <img
+            src={yt("RAdw_jCDAjs")}
+            alt="Beauty & Lifestyle"
+            style={{ filter: "grayscale(50%)" }}
+          />
         </a>
 
         <a
@@ -559,11 +687,19 @@ export default function HomePage({ projects }: HomePageProps) {
           rel="noopener noreferrer"
           className="mih-grid-cell mih-grid-tr"
         >
-          <img src={yt("Q7cLYdVysyY")} alt="ICICI Bank" style={{ filter: "grayscale(50%)" }} />
+          <img
+            src={yt("Q7cLYdVysyY")}
+            alt="ICICI Bank"
+            style={{ filter: "grayscale(50%)" }}
+          />
         </a>
 
         <div className="mih-grid-cell mih-grid-tall">
-          <img src={VARSHA_PHOTO} alt="Varsha — Make It Here" style={{ filter: "grayscale(25%)" }} />
+          <img
+            src={VARSHA_PHOTO}
+            alt="Varsha — Make It Here"
+            style={{ filter: "grayscale(25%)" }}
+          />
         </div>
 
         <a
@@ -572,7 +708,11 @@ export default function HomePage({ projects }: HomePageProps) {
           rel="noopener noreferrer"
           className="mih-grid-cell mih-grid-br"
         >
-          <img src={yt("d_irGzgCALc")} alt="Pro-bono" style={{ filter: "grayscale(60%)" }} />
+          <img
+            src={yt("d_irGzgCALc")}
+            alt="Pro-bono"
+            style={{ filter: "grayscale(60%)" }}
+          />
         </a>
 
         <div className="mih-grid-accent mih-grid-bl">
@@ -624,17 +764,17 @@ export default function HomePage({ projects }: HomePageProps) {
       <section id="about" className="mih-section">
         <div className="mih-about-grid">
           <div>
-            <span className="mih-about-label">— About</span>
-          </div>
-          <div>
+            <span className="mih-about-label">About</span>
             <h2 className="mih-about-quote">
-              Great brands are built on great stories. I make sure yours gets told.
+              Great brands are built on great stories. I make sure yours gets
+              told.
             </h2>
             <p className="mih-about-p">
-              Make It Here is a video content studio founded by Varsha. We create brand films,
-              digital campaigns, and social content for companies that want to cut through the noise.
-              From India&apos;s leading banks to healthcare groups, beauty brands, and food companies
-              — we&apos;ve told stories that matter, at scale.
+              Make It Here is a video content studio founded by Varsha. We
+              create brand films, digital campaigns, and social content for
+              companies that want to cut through the noise. From India&apos;s
+              leading banks to healthcare groups, beauty brands, and food
+              companies — we&apos;ve told stories that matter, at scale.
             </p>
           </div>
           <div className="mih-stats">
@@ -667,7 +807,9 @@ export default function HomePage({ projects }: HomePageProps) {
           items={projects.filter((project) => project.kind !== "print")}
           variant="film"
           expanded={expanded}
-          onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
+          onToggle={(key) =>
+            setExpanded((current) => ({ ...current, [key]: !current[key] }))
+          }
           onPreview={openLightbox}
         />
 
@@ -679,7 +821,9 @@ export default function HomePage({ projects }: HomePageProps) {
           items={projects.filter((project) => project.kind === "print")}
           variant="print"
           expanded={expanded}
-          onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
+          onToggle={(key) =>
+            setExpanded((current) => ({ ...current, [key]: !current[key] }))
+          }
           onPreview={openLightbox}
         />
       </section>
@@ -717,15 +861,35 @@ export default function HomePage({ projects }: HomePageProps) {
       <section id="contact" className="mih-contact">
         <div className="mih-contact-inner">
           <div className="mih-contact-top">
-            <h2 className="mih-contact-h2" style={{ color: "var(--background)" }}>
-              Let&apos;s Make
-              <br />
-              <span style={{ color: "var(--accent)" }}>Something.</span>
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "300px" }}>
+            <div className="mih-contact-copy">
+              <h2
+                className="mih-contact-h2"
+                style={{ color: "var(--background)" }}
+              >
+                Let&apos;s Make
+                <br />
+                <span style={{ color: "var(--accent)" }}>Something.</span>
+              </h2>
+              <a
+                href="mailto:makeitherebyvarsha@gmail.com"
+                className="mih-btn-solid"
+              >
+                Start a conversation
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M1 7h12M8 2l5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            </div>
+            <div className="mih-contact-right">
               <p className="mih-contact-p">
-                Available for brand films, campaigns, and social content. Reach out and let&apos;s
-                talk about your project.
+                Available for brand films, campaigns, and social content. Reach
+                out and let&apos;s talk about your project.
               </p>
               <div className="mih-contact-links">
                 {CONTACT_LINKS.map(({ label, value, href }) => (
@@ -743,25 +907,11 @@ export default function HomePage({ projects }: HomePageProps) {
               </div>
             </div>
           </div>
-          <div>
-            <a href="mailto:makeitherebyvarsha@gmail.com" className="mih-btn-solid">
-              Start a conversation
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M1 7h12M8 2l5 5-5 5"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          </div>
         </div>
       </section>
 
       <footer className="mih-footer">
-        <div className="mih-footer-logo">Make It Here. — by Varsha</div>
+        <div className="mih-footer-logo">Make It Here by Varsha</div>
         <div className="mih-footer-links">
           {FOOTER_LINKS.map(({ l, h }) => (
             <a
@@ -777,7 +927,11 @@ export default function HomePage({ projects }: HomePageProps) {
         </div>
         <p className="mih-footer-copy">© 2026 Make It Here</p>
       </footer>
-      <MediaLightbox state={lightbox} onClose={closeLightbox} onIndexChange={setLightboxIndex} />
+      <MediaLightbox
+        state={lightbox}
+        onClose={closeLightbox}
+        onIndexChange={setLightboxIndex}
+      />
     </div>
   );
 }

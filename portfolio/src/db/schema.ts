@@ -34,6 +34,14 @@ export const projectImages = pgTable("project_images", {
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
+export const media = pgTable("media", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  mimeType: text("mime_type").notNull(),
+  data: text("data").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const projectsRelations = relations(projects, ({ many }) => ({
   videos: many(projectVideos),
   images: many(projectImages),
@@ -59,3 +67,5 @@ export type ProjectVideo = typeof projectVideos.$inferSelect;
 export type NewProjectVideo = typeof projectVideos.$inferInsert;
 export type ProjectImage = typeof projectImages.$inferSelect;
 export type NewProjectImage = typeof projectImages.$inferInsert;
+export type Media = typeof media.$inferSelect;
+export type NewMedia = typeof media.$inferInsert;

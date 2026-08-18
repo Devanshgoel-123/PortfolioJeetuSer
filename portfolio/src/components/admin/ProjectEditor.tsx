@@ -10,6 +10,8 @@ type VideoField = {
   youtubeId: string;
   label: string;
   thumbnail: string;
+  localPreview?: string;
+  fileKey: number;
 };
 
 type ImageField = {
@@ -22,7 +24,7 @@ type ProjectEditorProps = {
 };
 
 function emptyVideo(): VideoField {
-  return { youtubeId: "", label: "", thumbnail: "" };
+  return { youtubeId: "", label: "", thumbnail: "", fileKey: 0 };
 }
 
 function emptyImage(): ImageField {
@@ -30,6 +32,7 @@ function emptyImage(): ImageField {
 }
 
 function videoPreviewSrc(video: VideoField): string | null {
+  if (video.localPreview) return video.localPreview;
   if (video.thumbnail.trim()) return video.thumbnail.trim();
   const id = extractYoutubeId(video.youtubeId);
   return id ? yt(id) : null;
@@ -43,6 +46,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
           youtubeId: video.youtubeId,
           label: video.label,
           thumbnail: video.thumbnail ?? "",
+          fileKey: 0,
         }))
       : [emptyVideo()],
   );
@@ -57,7 +61,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  function updateVideo(index: number, field: keyof VideoField, value: string) {
+  function updateVideo(index: number, field: "youtubeId" | "label" | "thumbnail", value: string) {
     setVideos((current) =>
       current.map((video, i) => (i === index ? { ...video, [field]: value } : video)),
     );
@@ -104,7 +108,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
         </div>
         <p className="admin-note">
           {kind === "film"
-            ? "Film projects use YouTube videos, each with an optional custom thumbnail."
+            ? "Film projects use YouTube videos. Upload a thumbnail image for each video, or leave it empty to use YouTube's own thumbnail."
             : "Print projects use a gallery of images instead of videos."}
         </p>
       </div>
@@ -214,14 +218,54 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
                     />
                   </div>
                   <div className="admin-media-span">
-                    <label className="admin-label">Thumbnail URL (optional)</label>
+                    <label className="admin-label">Thumbnail image (optional)</label>
+                    <input type="hidden" name="videoThumbnail" value={video.thumbnail} />
                     <input
-                      name="videoThumbnail"
+                      key={video.fileKey}
+                      name={`videoThumbnailFile-${index}`}
                       className="admin-input"
-                      value={video.thumbnail}
-                      onChange={(event) => updateVideo(index, "thumbnail", event.target.value)}
-                      placeholder="Leave blank to use the YouTube thumbnail"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        setVideos((current) =>
+                          current.map((item, i) =>
+                            i === index
+                              ? {
+                                  ...item,
+                                  localPreview: file ? URL.createObjectURL(file) : undefined,
+                                }
+                              : item,
+                          ),
+                        );
+                      }}
                     />
+                    <p className="admin-file-hint">
+                      JPEG, PNG, WebP, or GIF up to 3MB. Stored in the database. If you skip this,
+                      the YouTube thumbnail is used.
+                    </p>
+                    {video.thumbnail || video.localPreview ? (
+                      <button
+                        type="button"
+                        className="admin-text-btn"
+                        onClick={() =>
+                          setVideos((current) =>
+                            current.map((item, i) =>
+                              i === index
+                                ? {
+                                    ...item,
+                                    thumbnail: "",
+                                    localPreview: undefined,
+                                    fileKey: item.fileKey + 1,
+                                  }
+                                : item,
+                            ),
+                          )
+                        }
+                      >
+                        Remove thumbnail
+                      </button>
+                    ) : null}
                   </div>
                 </div>
                 <button

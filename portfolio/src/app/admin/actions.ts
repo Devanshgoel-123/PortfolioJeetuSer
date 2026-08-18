@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, getAdminPassword, isAdminAuthenticated, isValidAdminPassword } from "@/lib/auth";
-import { isMediaUrl } from "@/lib/media";
+import { isMediaUrl, saveMediaFile } from "@/lib/media";
 import {
   createProject,
   deleteProject,
@@ -33,24 +33,36 @@ async function requireAdmin() {
   }
 }
 
-function parseVideos(formData: FormData) {
+async function parseVideos(formData: FormData) {
   const labels = formData.getAll("videoLabel").map((value) => String(value).trim());
   const ids = formData.getAll("videoYoutubeId").map((value) => String(value).trim());
   const thumbs = formData.getAll("videoThumbnail").map((value) => String(value).trim());
 
-  return labels
-    .map((label, index) => {
-      const youtubeId = extractYoutubeId(ids[index] ?? "");
-      if (!label || !youtubeId) return null;
-      const thumbnail = thumbs[index] ?? "";
-      return {
-        label,
-        youtubeId,
-        thumbnail: isMediaUrl(thumbnail) ? thumbnail : undefined,
-        sortOrder: index,
-      };
-    })
-    .filter((video): video is NonNullable<typeof video> => video !== null);
+  const videos: ProjectInput["videos"] = [];
+
+  for (let index = 0; index < labels.length; index += 1) {
+    const label = labels[index];
+    const youtubeId = extractYoutubeId(ids[index] ?? "");
+    if (!label || !youtubeId) continue;
+
+    const file = formData.get(`videoThumbnailFile-${index}`);
+    let thumbnail: string | undefined;
+
+    if (file instanceof File && file.size > 0) {
+      thumbnail = await saveMediaFile(file);
+    } else if (isMediaUrl(thumbs[index] ?? "")) {
+      thumbnail = thumbs[index];
+    }
+
+    videos.push({
+      label,
+      youtubeId,
+      thumbnail,
+      sortOrder: index,
+    });
+  }
+
+  return videos;
 }
 
 function parseImages(formData: FormData) {
@@ -69,7 +81,7 @@ function parseImages(formData: FormData) {
     .filter((image): image is NonNullable<typeof image> => image !== null);
 }
 
-function parseProjectForm(formData: FormData): ProjectInput | null {
+async function parseProjectForm(formData: FormData): Promise<ProjectInput | null> {
   const client = String(formData.get("client") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
   const year = String(formData.get("year") ?? "").trim();
@@ -80,7 +92,7 @@ function parseProjectForm(formData: FormData): ProjectInput | null {
   if (!client || !category || !year || !isWorkKind(kindValue)) return null;
 
   const kind: WorkKind = kindValue;
-  const videos = kind === "film" ? parseVideos(formData) : [];
+  const videos = kind === "film" ? await parseVideos(formData) : [];
   const images = kind === "print" ? parseImages(formData) : [];
 
   return {
@@ -153,7 +165,15 @@ export async function getAdminProjects(): Promise<AdminProject[]> {
 export async function saveProjectAction(formData: FormData) {
   await requireAdmin();
 
-  const input = parseProjectForm(formData);
+  let input: ProjectInput | null;
+  try {
+    input = await parseProjectForm(formData);
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Could not save the thumbnail image.",
+    };
+  }
+
   if (!input) {
     return { error: "Please fill in client, category, year, and choose Film or Print." };
   }
