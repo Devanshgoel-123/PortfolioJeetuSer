@@ -17,6 +17,8 @@ type VideoField = {
 type ImageField = {
   url: string;
   label: string;
+  localPreview?: string;
+  fileKey: number;
 };
 
 type ProjectEditorProps = {
@@ -28,7 +30,7 @@ function emptyVideo(): VideoField {
 }
 
 function emptyImage(): ImageField {
-  return { url: "", label: "" };
+  return { url: "", label: "", fileKey: 0 };
 }
 
 function videoPreviewSrc(video: VideoField): string | null {
@@ -55,6 +57,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
       ? project.images.map((image) => ({
           url: image.url,
           label: image.label,
+          fileKey: 0,
         }))
       : [emptyImage()],
   );
@@ -109,7 +112,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
         <p className="admin-note">
           {kind === "film"
             ? "Film projects use YouTube videos. Upload a thumbnail image for each video, or leave it empty to use YouTube's own thumbnail."
-            : "Print projects use a gallery of images instead of videos."}
+            : "Print projects use a gallery of uploaded images."}
         </p>
       </div>
 
@@ -295,47 +298,89 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
             </button>
           </div>
 
-          {images.map((image, index) => (
-            <div key={index} className="admin-media-row">
-              <div className="admin-media-preview">
-                {image.url.trim() ? (
-                  <img src={image.url} alt={image.label || "Print image"} />
-                ) : (
-                  <span>Image</span>
-                )}
-              </div>
-              <div className="admin-media-fields">
-                <div className="admin-media-span">
-                  <label className="admin-label">Image URL</label>
-                  <input
-                    name="imageUrl"
-                    className="admin-input"
-                    value={image.url}
-                    onChange={(event) => updateImage(index, "url", event.target.value)}
-                    placeholder="https://..."
-                  />
+          {images.map((image, index) => {
+            const preview = image.localPreview || image.url.trim();
+            return (
+              <div key={index} className="admin-media-row">
+                <div className="admin-media-preview">
+                  {preview ? (
+                    <img src={preview} alt={image.label || "Print image"} />
+                  ) : (
+                    <span>Image</span>
+                  )}
                 </div>
-                <div className="admin-media-span">
-                  <label className="admin-label">Label</label>
-                  <input
-                    name="imageLabel"
-                    className="admin-input"
-                    value={image.label}
-                    onChange={(event) => updateImage(index, "label", event.target.value)}
-                    placeholder="Cover, Spread 01..."
-                  />
+                <div className="admin-media-fields">
+                  <div className="admin-media-span">
+                    <label className="admin-label">Label</label>
+                    <input
+                      name="imageLabel"
+                      className="admin-input"
+                      value={image.label}
+                      onChange={(event) => updateImage(index, "label", event.target.value)}
+                      placeholder="Cover, Spread 01..."
+                    />
+                  </div>
+                  <div className="admin-media-span">
+                    <label className="admin-label">Image</label>
+                    <input type="hidden" name="imageUrl" value={image.url} />
+                    <input
+                      key={image.fileKey}
+                      name={`imageFile-${index}`}
+                      className="admin-input"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        setImages((current) =>
+                          current.map((item, i) =>
+                            i === index
+                              ? {
+                                  ...item,
+                                  localPreview: file ? URL.createObjectURL(file) : undefined,
+                                }
+                              : item,
+                          ),
+                        );
+                      }}
+                    />
+                    <p className="admin-file-hint">
+                      JPEG, PNG, WebP, or GIF up to 3MB. Stored in the database.
+                    </p>
+                    {image.url || image.localPreview ? (
+                      <button
+                        type="button"
+                        className="admin-text-btn"
+                        onClick={() =>
+                          setImages((current) =>
+                            current.map((item, i) =>
+                              i === index
+                                ? {
+                                    ...item,
+                                    url: "",
+                                    localPreview: undefined,
+                                    fileKey: item.fileKey + 1,
+                                  }
+                                : item,
+                            ),
+                          )
+                        }
+                      >
+                        Remove image
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-secondary"
+                  onClick={() => setImages((current) => current.filter((_, i) => i !== index))}
+                  disabled={images.length === 1}
+                >
+                  Remove
+                </button>
               </div>
-              <button
-                type="button"
-                className="admin-btn admin-btn-secondary"
-                onClick={() => setImages((current) => current.filter((_, i) => i !== index))}
-                disabled={images.length === 1}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

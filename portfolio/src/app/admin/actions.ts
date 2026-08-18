@@ -65,20 +65,33 @@ async function parseVideos(formData: FormData) {
   return videos;
 }
 
-function parseImages(formData: FormData) {
+async function parseImages(formData: FormData) {
   const urls = formData.getAll("imageUrl").map((value) => String(value).trim());
   const labels = formData.getAll("imageLabel").map((value) => String(value).trim());
+  const count = Math.max(urls.length, labels.length);
 
-  return urls
-    .map((url, index) => {
-      if (!isMediaUrl(url)) return null;
-      return {
-        url,
-        label: labels[index] || `Image ${index + 1}`,
-        sortOrder: index,
-      };
-    })
-    .filter((image): image is NonNullable<typeof image> => image !== null);
+  const images: ProjectInput["images"] = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const file = formData.get(`imageFile-${index}`);
+    let url: string | undefined;
+
+    if (file instanceof File && file.size > 0) {
+      url = await saveMediaFile(file);
+    } else if (isMediaUrl(urls[index] ?? "")) {
+      url = urls[index];
+    }
+
+    if (!url) continue;
+
+    images.push({
+      url,
+      label: labels[index] || `Image ${index + 1}`,
+      sortOrder: index,
+    });
+  }
+
+  return images;
 }
 
 async function parseProjectForm(formData: FormData): Promise<ProjectInput | null> {
@@ -93,7 +106,7 @@ async function parseProjectForm(formData: FormData): Promise<ProjectInput | null
 
   const kind: WorkKind = kindValue;
   const videos = kind === "film" ? await parseVideos(formData) : [];
-  const images = kind === "print" ? parseImages(formData) : [];
+  const images = kind === "print" ? await parseImages(formData) : [];
 
   return {
     client,
@@ -183,7 +196,7 @@ export async function saveProjectAction(formData: FormData) {
   }
 
   if (input.kind === "print" && input.images.length === 0) {
-    return { error: "Add at least one image with a valid image URL." };
+    return { error: "Add at least one image with an uploaded file." };
   }
 
   const projectId = Number(formData.get("projectId"));

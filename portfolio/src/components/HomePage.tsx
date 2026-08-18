@@ -605,19 +605,17 @@ export default function HomePage({ projects }: HomePageProps) {
         <div className="mih-hero-watermark">26</div>
 
         <div className="mih-hero-content">
+          <h1 className="mih-hero-h1" style={{ color: "var(--brand)" }}>
+            Make It
+            <br />
+            <span style={{ color: "var(--accent)" }}>Here.</span>
+          </h1>
           <div className="mih-hero-main">
-            <div className="mih-hero-copy">
-              <h1 className="mih-hero-h1" style={{ color: "var(--brand)" }}>
-                Make It
-                <br />
-                <span style={{ color: "var(--accent)" }}>Here.</span>
-              </h1>
-              <p className="mih-hero-p">
-                Video content studio by Varsha, creating brand films, campaigns,
-                and stories for India&apos;s most ambitious companies across
-                beauty, finance, healthcare, and food.
-              </p>
-            </div>
+            <p className="mih-hero-p">
+              Video content studio by Varsha, creating brand films, campaigns,
+              and stories for India&apos;s most ambitious companies across
+              beauty, finance, healthcare, and food.
+            </p>
             <div className="mih-hero-actions">
               <a href="#work" className="mih-btn-outline">
                 View Work
@@ -793,15 +791,6 @@ export default function HomePage({ projects }: HomePageProps) {
       <section id="work" className="mih-section">
         <div className="mih-section-header">
           <h2 className="mih-section-h2">Films</h2>
-          <a
-            href="https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mih-showreel-link"
-          >
-            Full showreel
-            <ArrowUpRight />
-          </a>
         </div>
         <WorkAccordion
           items={projects.filter((project) => project.kind !== "print")}

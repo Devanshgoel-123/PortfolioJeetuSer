@@ -13,7 +13,7 @@
   --primary: #0d0d0d;
   --brand: #0a1f4e;
   --nav-link: #4a4a4a;
-  --px: 1.25rem;
+  --px: max(1.25rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --primary-foreground: #ffffff;
   --secondary: #f0ede8;
   --secondary-foreground: #0d0d0d;
