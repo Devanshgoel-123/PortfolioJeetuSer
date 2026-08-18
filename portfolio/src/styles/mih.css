@@ -232,6 +232,15 @@ img {
   text-decoration: none;
   transition: color 0.15s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mih-arrow-ne {
+  display: block;
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 .mih-link-ghost:hover {
@@ -597,7 +606,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4.5rem 1.25rem 1.25rem;
+  padding: 4.5rem 4.25rem 1.25rem;
 }
 
 .mih-lightbox-close {
@@ -620,6 +629,36 @@ img {
   background: #fff;
   color: #0d0d0d;
   border-color: #fff;
+}
+
+.mih-lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(13, 13, 13, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 81;
+}
+
+.mih-lightbox-arrow:hover {
+  background: #fff;
+  color: #0d0d0d;
+  border-color: #fff;
+}
+
+.mih-lightbox-arrow-prev {
+  left: 1.15rem;
+}
+
+.mih-lightbox-arrow-next {
+  right: 1.15rem;
 }
 
 .mih-lightbox-figure {
@@ -1044,6 +1083,25 @@ img {
 
 .mih-grid-bc {
   grid-column: 1 / -1;
+}
+
+@media (max-width: 639px) {
+  .mih-lightbox {
+    padding: 4.5rem 3.25rem 1.25rem;
+  }
+
+  .mih-lightbox-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mih-lightbox-arrow-prev {
+    left: 0.55rem;
+  }
+
+  .mih-lightbox-arrow-next {
+    right: 0.55rem;
+  }
 }
 
 @media (min-width: 640px) {

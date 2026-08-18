@@ -31,7 +31,15 @@ function PlusIcon() {
 
 function ArrowUpRight() {
   return (
-    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <svg
+      className="mih-arrow-ne"
+      width="11"
+      height="11"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
       <path
         d="M2.5 9.5L9.5 2.5M9.5 2.5H3.5M9.5 2.5V8.5"
         stroke="currentColor"
@@ -48,6 +56,11 @@ type LightboxItem = {
   label: string;
 };
 
+type LightboxState = {
+  items: LightboxItem[];
+  index: number;
+};
+
 function CloseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -56,18 +69,51 @@ function CloseIcon() {
   );
 }
 
+function ChevronLeft() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M12 3L6 9l6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChevronRight() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M6 3l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function MediaLightbox({
-  item,
+  state,
   onClose,
+  onIndexChange,
 }: {
-  item: LightboxItem | null;
+  state: LightboxState | null;
   onClose: () => void;
+  onIndexChange: (index: number) => void;
 }) {
+  const item = state?.items[state.index] ?? null;
+  const count = state?.items.length ?? 0;
+  const canNavigate = count > 1;
+
+  const goTo = useCallback(
+    (direction: -1 | 1) => {
+      if (!state || state.items.length < 2) return;
+      const next = (state.index + direction + state.items.length) % state.items.length;
+      onIndexChange(next);
+    },
+    [onIndexChange, state],
+  );
+
   useEffect(() => {
-    if (!item) return;
+    if (!state) return;
 
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
+      if (event.key === "ArrowRight") goTo(1);
+      if (event.key === "ArrowLeft") goTo(-1);
     }
 
     const previousOverflow = document.body.style.overflow;
@@ -78,18 +124,47 @@ function MediaLightbox({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [item, onClose]);
+  }, [goTo, onClose, state]);
 
-  if (!item) return null;
+  if (!item || !state) return null;
 
   return (
     <div className="mih-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label="Image preview">
       <button type="button" className="mih-lightbox-close" onClick={onClose} aria-label="Close preview">
         <CloseIcon />
       </button>
+      {canNavigate ? (
+        <button
+          type="button"
+          className="mih-lightbox-arrow mih-lightbox-arrow-prev"
+          onClick={(event) => {
+            event.stopPropagation();
+            goTo(-1);
+          }}
+          aria-label="Previous image"
+        >
+          <ChevronLeft />
+        </button>
+      ) : null}
+      {canNavigate ? (
+        <button
+          type="button"
+          className="mih-lightbox-arrow mih-lightbox-arrow-next"
+          onClick={(event) => {
+            event.stopPropagation();
+            goTo(1);
+          }}
+          aria-label="Next image"
+        >
+          <ChevronRight />
+        </button>
+      ) : null}
       <figure className="mih-lightbox-figure" onClick={(event) => event.stopPropagation()}>
         <img src={item.src} alt={item.label} />
-        {item.label ? <figcaption className="mih-lightbox-caption">{item.label}</figcaption> : null}
+        <figcaption className="mih-lightbox-caption">
+          {item.label}
+          {canNavigate ? `  ·  ${state.index + 1} / ${count}` : ""}
+        </figcaption>
       </figure>
     </div>
   );
@@ -100,7 +175,7 @@ function PosterCarousel({
   onPreview,
 }: {
   images: DisplayProject["images"];
-  onPreview: (item: LightboxItem) => void;
+  onPreview: (items: LightboxItem[], index: number) => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -157,12 +232,17 @@ function PosterCarousel({
           </div>
         </div>
         <div className="mih-poster-track" ref={trackRef}>
-          {images.map((image) => (
+          {images.map((image, index) => (
             <button
               key={`${image.url}-${image.label}`}
               type="button"
               className="mih-poster-item"
-              onClick={() => onPreview({ src: image.url, label: image.label })}
+              onClick={() =>
+                onPreview(
+                  images.map((entry) => ({ src: entry.url, label: entry.label })),
+                  index,
+                )
+              }
             >
               <img src={image.url} alt={image.label} />
               <div className="mih-poster-overlay">
@@ -190,7 +270,7 @@ function WorkAccordion({
   variant: "film" | "print";
   expanded: Record<string, boolean>;
   onToggle: (key: string) => void;
-  onPreview: (item: LightboxItem) => void;
+  onPreview: (items: LightboxItem[], index: number) => void;
 }) {
   return (
     <div>
@@ -225,14 +305,22 @@ function WorkAccordion({
                 <PosterCarousel images={item.images} onPreview={onPreview} />
               ) : (
                 <div className="mih-films-panel">
-                  {item.videos.map(({ id, label, thumb }) => {
+                  {item.videos.map(({ id, label, thumb }, videoIndex) => {
                     const previewSrc = thumb || yt(id);
                     return (
                       <div key={id} className="mih-video-card">
                         <button
                           type="button"
                           className="mih-video-thumb"
-                          onClick={() => onPreview({ src: previewSrc, label })}
+                          onClick={() =>
+                            onPreview(
+                              item.videos.map((video) => ({
+                                src: video.thumb || yt(video.id),
+                                label: video.label,
+                              })),
+                              videoIndex,
+                            )
+                          }
                           aria-label={`Preview ${label}`}
                         >
                           <img src={previewSrc} alt={label} />
@@ -264,8 +352,14 @@ export default function HomePage({ projects }: HomePageProps) {
   const [scrollY, setScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
+  const [lightbox, setLightbox] = useState<LightboxState | null>(null);
   const closeLightbox = useCallback(() => setLightbox(null), []);
+  const openLightbox = useCallback((items: LightboxItem[], index: number) => {
+    setLightbox({ items, index });
+  }, []);
+  const setLightboxIndex = useCallback((index: number) => {
+    setLightbox((current) => (current ? { ...current, index } : current));
+  }, []);
   const [heroSlide, setHeroSlide] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
 
@@ -410,7 +504,8 @@ export default function HomePage({ projects }: HomePageProps) {
                 rel="noopener noreferrer"
                 className="mih-link-ghost"
               >
-                Watch Showreel ↗
+                Watch Showreel
+                <ArrowUpRight />
               </a>
             </div>
           </div>
@@ -573,7 +668,7 @@ export default function HomePage({ projects }: HomePageProps) {
           variant="film"
           expanded={expanded}
           onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
-          onPreview={setLightbox}
+          onPreview={openLightbox}
         />
 
         <div className="mih-section-header mih-print-heading">
@@ -585,7 +680,7 @@ export default function HomePage({ projects }: HomePageProps) {
           variant="print"
           expanded={expanded}
           onToggle={(key) => setExpanded((current) => ({ ...current, [key]: !current[key] }))}
-          onPreview={setLightbox}
+          onPreview={openLightbox}
         />
       </section>
 
@@ -682,7 +777,7 @@ export default function HomePage({ projects }: HomePageProps) {
         </div>
         <p className="mih-footer-copy">© 2026 Make It Here</p>
       </footer>
-      <MediaLightbox item={lightbox} onClose={closeLightbox} />
+      <MediaLightbox state={lightbox} onClose={closeLightbox} onIndexChange={setLightboxIndex} />
     </div>
   );
 }
