@@ -44,6 +44,7 @@ function parseProjectBody(body: unknown): ProjectInput | null {
         youtubeId,
         label,
         thumbnail: isMediaUrl(thumbnail) ? thumbnail : undefined,
+        featured: item.featured === true,
         sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index,
       };
     })

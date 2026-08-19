@@ -241,6 +241,20 @@
   line-height: 1.5;
 }
 
+.admin-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  color: #0d0d0d;
+  cursor: pointer;
+}
+
+.admin-check input {
+  margin: 0;
+}
+
 .admin-text-btn {
   margin-top: 0.45rem;
   padding: 0;

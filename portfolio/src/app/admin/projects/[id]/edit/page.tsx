@@ -40,6 +40,7 @@ export default async function EditProjectPage({ params }: PageProps) {
       youtubeId: video.youtubeId,
       label: video.label,
       thumbnail: video.thumbnail ?? "",
+      featured: Boolean(video.featured),
       sortOrder: video.sortOrder,
     })),
     images: project.images.map((image) => ({

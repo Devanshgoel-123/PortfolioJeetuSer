@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   VARSHA_PHOTO,
-  HERO_SLIDES,
   NAV_LINKS,
   SERVICES,
   STATS,
@@ -19,6 +18,57 @@ type HomePageProps = {
 
 function workKey(item: DisplayProject) {
   return `${item.kind}-${item.id}`;
+}
+
+type LandingThumb = {
+  src: string;
+  label: string;
+  href: string;
+};
+
+function landingThumbs(projects: DisplayProject[]): { thumbs: LandingThumb[]; sequential: boolean } {
+  const films = projects.filter((project) => project.kind !== "print");
+  const featured = films.flatMap((project) =>
+    project.videos
+      .filter((video) => video.featured && video.thumb)
+      .map((video) => ({
+        src: video.thumb,
+        label: project.client,
+        href: ytUrl(video.id),
+      })),
+  );
+
+  if (featured.length > 0) {
+    return { thumbs: featured, sequential: true };
+  }
+
+  return {
+    thumbs: films
+      .filter((project) => project.thumb)
+      .map((project) => ({
+        src: project.thumb,
+        label: project.client,
+        href: project.href,
+      })),
+    sequential: false,
+  };
+}
+
+function pickGridThumbs(thumbs: LandingThumb[], sequential: boolean) {
+  if (thumbs.length === 0) return null;
+
+  const main = thumbs[0];
+  const tr = thumbs[1] ?? main;
+  const br = sequential
+    ? (thumbs[2] ?? thumbs[thumbs.length - 1] ?? main)
+    : (thumbs[thumbs.length - 1] ?? main);
+  const bc = sequential
+    ? (thumbs[3] ?? thumbs[2] ?? thumbs[1] ?? main)
+    : thumbs.length >= 3
+      ? thumbs[thumbs.length - 2]!
+      : (thumbs[1] ?? main);
+
+  return { main, tr, br, bc };
 }
 
 function PlusIcon() {
@@ -466,6 +516,19 @@ export default function HomePage({ projects }: HomePageProps) {
   const [heroSlide, setHeroSlide] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
 
+  const landing = useMemo(() => landingThumbs(projects), [projects]);
+  const gridFilms = useMemo(
+    () => pickGridThumbs(landing.thumbs, landing.sequential),
+    [landing],
+  );
+  const heroSlides = useMemo(
+    () => [
+      { src: VARSHA_PHOTO, label: "" },
+      ...landing.thumbs.map((thumb) => ({ src: thumb.src, label: thumb.label })),
+    ],
+    [landing],
+  );
+
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -473,15 +536,16 @@ export default function HomePage({ projects }: HomePageProps) {
   }, []);
 
   useEffect(() => {
+    if (heroSlides.length < 2) return;
     const timer = setInterval(() => {
       setHeroFading(true);
       setTimeout(() => {
-        setHeroSlide((s) => (s + 1) % HERO_SLIDES.length);
+        setHeroSlide((s) => (s + 1) % heroSlides.length);
         setHeroFading(false);
       }, 500);
     }, 3500);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSlides.length]);
 
   const goToSlide = (index: number) => {
     setHeroFading(true);
@@ -560,9 +624,9 @@ export default function HomePage({ projects }: HomePageProps) {
       )}
 
       <section className="mih-hero">
-        {HERO_SLIDES.map((slide, i) => (
+        {heroSlides.map((slide, i) => (
           <div
-            key={i}
+            key={`${slide.src}-${i}`}
             className="mih-hero-bg"
             style={{
               position: "absolute",
@@ -576,17 +640,17 @@ export default function HomePage({ projects }: HomePageProps) {
           />
         ))}
 
-        {HERO_SLIDES[heroSlide].label && (
+        {heroSlides[heroSlide]?.label ? (
           <div
             className="mih-hero-slide-label"
             style={{ opacity: heroFading ? 0 : 1 }}
           >
-            {HERO_SLIDES[heroSlide].label}
+            {heroSlides[heroSlide].label}
           </div>
-        )}
+        ) : null}
 
         <div className="mih-hero-dots">
-          {HERO_SLIDES.map((_, i) => (
+          {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}
@@ -666,31 +730,35 @@ export default function HomePage({ projects }: HomePageProps) {
       </section>
 
       <section className="mih-grid">
-        <a
-          href={ytUrl("RAdw_jCDAjs")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mih-grid-cell mih-grid-main"
-        >
-          <img
-            src={yt("RAdw_jCDAjs")}
-            alt="Beauty & Lifestyle"
-            style={{ filter: "grayscale(50%)" }}
-          />
-        </a>
+        {gridFilms?.main ? (
+          <a
+            href={gridFilms.main.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mih-grid-cell mih-grid-main"
+          >
+            <img
+              src={gridFilms.main.src}
+              alt={gridFilms.main.label}
+              style={{ filter: "grayscale(50%)" }}
+            />
+          </a>
+        ) : null}
 
-        <a
-          href={ytUrl("Q7cLYdVysyY")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mih-grid-cell mih-grid-tr"
-        >
-          <img
-            src={yt("Q7cLYdVysyY")}
-            alt="ICICI Bank"
-            style={{ filter: "grayscale(50%)" }}
-          />
-        </a>
+        {gridFilms?.tr ? (
+          <a
+            href={gridFilms.tr.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mih-grid-cell mih-grid-tr"
+          >
+            <img
+              src={gridFilms.tr.src}
+              alt={gridFilms.tr.label}
+              style={{ filter: "grayscale(50%)" }}
+            />
+          </a>
+        ) : null}
 
         <div className="mih-grid-cell mih-grid-tall">
           <img
@@ -700,18 +768,20 @@ export default function HomePage({ projects }: HomePageProps) {
           />
         </div>
 
-        <a
-          href={ytUrl("d_irGzgCALc")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mih-grid-cell mih-grid-br"
-        >
-          <img
-            src={yt("d_irGzgCALc")}
-            alt="Pro-bono"
-            style={{ filter: "grayscale(60%)" }}
-          />
-        </a>
+        {gridFilms?.br ? (
+          <a
+            href={gridFilms.br.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mih-grid-cell mih-grid-br"
+          >
+            <img
+              src={gridFilms.br.src}
+              alt={gridFilms.br.label}
+              style={{ filter: "grayscale(60%)" }}
+            />
+          </a>
+        ) : null}
 
         <div className="mih-grid-accent mih-grid-bl">
           <p>
@@ -722,7 +792,9 @@ export default function HomePage({ projects }: HomePageProps) {
         </div>
 
         <div className="mih-grid-overlay mih-grid-bc">
-          <img src={yt("KCcEEo3-8QA")} alt="Foods" />
+          {gridFilms?.bc ? (
+            <img src={gridFilms.bc.src} alt={gridFilms.bc.label} />
+          ) : null}
           <div className="mih-grid-overlay-text">
             <div style={{ textAlign: "right" }}>
               <p

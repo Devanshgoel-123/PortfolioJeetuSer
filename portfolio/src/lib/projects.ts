@@ -24,6 +24,7 @@ export function toDisplayProject(
     id: video.youtubeId,
     label: video.label,
     thumb: video.thumbnail || yt(video.youtubeId),
+    featured: Boolean(video.featured),
   }));
 
   const imagesDisplay = sortedImages.map((image) => ({
@@ -109,6 +110,7 @@ export async function createProject(input: ProjectInput) {
         youtubeId: video.youtubeId,
         label: video.label,
         thumbnail: video.thumbnail || null,
+        featured: video.featured ?? false,
         sortOrder: video.sortOrder ?? index,
       })),
     );
@@ -154,6 +156,7 @@ export async function updateProject(id: number, input: ProjectInput) {
         youtubeId: video.youtubeId,
         label: video.label,
         thumbnail: video.thumbnail || null,
+        featured: video.featured ?? false,
         sortOrder: video.sortOrder ?? index,
       })),
     );

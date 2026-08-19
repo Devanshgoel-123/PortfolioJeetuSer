@@ -10,6 +10,7 @@ type VideoField = {
   youtubeId: string;
   label: string;
   thumbnail: string;
+  featured: boolean;
   localPreview?: string;
   fileKey: number;
 };
@@ -26,7 +27,7 @@ type ProjectEditorProps = {
 };
 
 function emptyVideo(): VideoField {
-  return { youtubeId: "", label: "", thumbnail: "", fileKey: 0 };
+  return { youtubeId: "", label: "", thumbnail: "", featured: false, fileKey: 0 };
 }
 
 function emptyImage(): ImageField {
@@ -48,6 +49,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
           youtubeId: video.youtubeId,
           label: video.label,
           thumbnail: video.thumbnail ?? "",
+          featured: Boolean(video.featured),
           fileKey: 0,
         }))
       : [emptyVideo()],
@@ -111,7 +113,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
         </div>
         <p className="admin-note">
           {kind === "film"
-            ? "Film projects use YouTube videos. Upload a thumbnail image for each video, or leave it empty to use YouTube's own thumbnail."
+            ? "Film projects use YouTube videos. Upload a thumbnail, then check Show on homepage. The first four checked videos fill the photo grid (large, top right, bottom right, overlay); all checked videos appear in the hero."
             : "Print projects use a gallery of uploaded images."}
         </p>
       </div>
@@ -223,6 +225,7 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
                   <div className="admin-media-span">
                     <label className="admin-label">Thumbnail image (optional)</label>
                     <input type="hidden" name="videoThumbnail" value={video.thumbnail} />
+                    <input type="hidden" name="videoFeatured" value={video.featured ? "1" : "0"} />
                     <input
                       key={video.fileKey}
                       name={`videoThumbnailFile-${index}`}
@@ -247,6 +250,20 @@ export default function ProjectEditor({ project }: ProjectEditorProps) {
                       JPEG, PNG, WebP, or GIF up to 3MB. Stored in the database. If you skip this,
                       the YouTube thumbnail is used.
                     </p>
+                    <label className="admin-check">
+                      <input
+                        type="checkbox"
+                        checked={video.featured}
+                        onChange={(event) =>
+                          setVideos((current) =>
+                            current.map((item, i) =>
+                              i === index ? { ...item, featured: event.target.checked } : item,
+                            ),
+                          )
+                        }
+                      />
+                      <span>Show on homepage</span>
+                    </label>
                     {video.thumbnail || video.localPreview ? (
                       <button
                         type="button"

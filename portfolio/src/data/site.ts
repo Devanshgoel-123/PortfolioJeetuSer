@@ -1,18 +1,5 @@
-import { yt } from "@/lib/youtube";
-
 export const VARSHA_PHOTO =
   "https://images.unsplash.com/photo-1547212371-eb5e6a4b590c?w=1200&h=900&fit=crop&auto=format&q=80";
-
-export const HERO_SLIDES = [
-  { src: VARSHA_PHOTO, label: "" },
-  { src: yt("RAdw_jCDAjs"), label: "Beauty & Lifestyle" },
-  { src: yt("Q7cLYdVysyY"), label: "ICICI Bank" },
-  { src: yt("3SLDmRjx7Og"), label: "Hubble Money" },
-  { src: yt("cd_RtZ0KuIw"), label: "Manipal Healthcare" },
-  { src: yt("53QAAPOHCXo"), label: "Healthcare" },
-  { src: yt("KCcEEo3-8QA"), label: "Foods" },
-  { src: yt("d_irGzgCALc"), label: "Pro-bono" },
-];
 
 export const NAV_LINKS = [
   { label: "Work", href: "#work" },

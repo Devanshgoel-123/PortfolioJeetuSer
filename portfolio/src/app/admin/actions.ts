@@ -23,7 +23,13 @@ export type AdminProject = {
   kind: WorkKind;
   sortOrder: number;
   published: boolean;
-  videos: Array<{ youtubeId: string; label: string; thumbnail: string; sortOrder: number }>;
+  videos: Array<{
+    youtubeId: string;
+    label: string;
+    thumbnail: string;
+    featured: boolean;
+    sortOrder: number;
+  }>;
   images: Array<{ url: string; label: string; sortOrder: number }>;
 };
 
@@ -37,6 +43,7 @@ async function parseVideos(formData: FormData) {
   const labels = formData.getAll("videoLabel").map((value) => String(value).trim());
   const ids = formData.getAll("videoYoutubeId").map((value) => String(value).trim());
   const thumbs = formData.getAll("videoThumbnail").map((value) => String(value).trim());
+  const featuredFlags = formData.getAll("videoFeatured").map((value) => String(value));
 
   const videos: ProjectInput["videos"] = [];
 
@@ -58,6 +65,7 @@ async function parseVideos(formData: FormData) {
       label,
       youtubeId,
       thumbnail,
+      featured: featuredFlags[index] === "1",
       sortOrder: index,
     });
   }
@@ -165,6 +173,7 @@ export async function getAdminProjects(): Promise<AdminProject[]> {
       youtubeId: video.youtubeId,
       label: video.label,
       thumbnail: video.thumbnail ?? "",
+      featured: Boolean(video.featured),
       sortOrder: video.sortOrder,
     })),
     images: project.images.map((image) => ({

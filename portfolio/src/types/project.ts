@@ -9,6 +9,7 @@ export type DisplayVideo = {
   id: string;
   label: string;
   thumb: string;
+  featured?: boolean;
 };
 
 export type DisplayImage = {
@@ -35,6 +36,12 @@ export type ProjectInput = {
   kind: WorkKind;
   sortOrder?: number;
   published?: boolean;
-  videos: Array<{ youtubeId: string; label: string; thumbnail?: string; sortOrder?: number }>;
+  videos: Array<{
+    youtubeId: string;
+    label: string;
+    thumbnail?: string;
+    featured?: boolean;
+    sortOrder?: number;
+  }>;
   images: Array<{ url: string; label: string; sortOrder?: number }>;
 };

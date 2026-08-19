@@ -21,6 +21,7 @@ export const projectVideos = pgTable("project_videos", {
   youtubeId: text("youtube_id").notNull(),
   label: text("label").notNull(),
   thumbnail: text("thumbnail"),
+  featured: boolean("featured").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
