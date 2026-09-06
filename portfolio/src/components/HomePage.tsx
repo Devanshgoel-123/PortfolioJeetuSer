@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
-  VARSHA_PHOTO,
+  ABOUT_PHOTO,
+  SHOWREEL_URL,
   NAV_LINKS,
   SERVICES,
   STATS,
@@ -67,8 +68,9 @@ function pickGridThumbs(thumbs: LandingThumb[], sequential: boolean) {
     : thumbs.length >= 3
       ? thumbs[thumbs.length - 2]!
       : (thumbs[1] ?? main);
+  const tall = thumbs[4] ?? thumbs[2] ?? main;
 
-  return { main, tr, br, bc };
+  return { main, tr, br, bc, tall };
 }
 
 function PlusIcon() {
@@ -522,10 +524,7 @@ export default function HomePage({ projects }: HomePageProps) {
     [landing],
   );
   const heroSlides = useMemo(
-    () => [
-      { src: VARSHA_PHOTO, label: "" },
-      ...landing.thumbs.map((thumb) => ({ src: thumb.src, label: thumb.label })),
-    ],
+    () => landing.thumbs.map((thumb) => ({ src: thumb.src, label: thumb.label })),
     [landing],
   );
 
@@ -557,7 +556,7 @@ export default function HomePage({ projects }: HomePageProps) {
 
   return (
     <div className="mih-root">
-      <nav className={`mih-nav${scrollY > 40 ? " scrolled" : ""}`}>
+      <nav className="mih-nav">
         <a href="#" className="mih-nav-logo">
           Make It Here.
         </a>
@@ -675,17 +674,35 @@ export default function HomePage({ projects }: HomePageProps) {
             <span style={{ color: "var(--accent)" }}>Here.</span>
           </h1>
           <div className="mih-hero-main">
-            <p className="mih-hero-p">
-              Video content studio by Varsha, creating brand films, campaigns,
-              and stories for India&apos;s most ambitious companies across
-              beauty, finance, healthcare, and food.
-            </p>
+            <div className="mih-hero-copy">
+              <p className="mih-hero-p">
+                Isn&apos;t an instruction. It isn&apos;t a request. It&apos;s a
+                platform. <br/>
+              {/* </p>
+              <p className="mih-hero-p"> */}
+                A space where brands come to build — through sharp strategy,
+                compelling ideas, and films designed for today&apos;s platforms.<br/>
+              {/* </p>
+              <p className="mih-hero-p"> */}
+                From brand strategy for film campaigns and digital ecosystems, to
+                full-scale brand campaigns, standalone films, promo scripts, award
+                show speeches, and influencer content — everything begins with a
+                platform-first mindset. Beyond that, &ldquo;Make It Here.&rdquo;
+                offers end-to-end execution: strategy, scripting, and production —
+                whether powered by AI or brought to life through traditional
+                shoots.<br/>
+              {/* </p>
+              <p className="mih-hero-p"> */}
+                Whatever your brand needs to express that big-brand energy — Make
+                It Here.
+              </p>
+            </div>
             <div className="mih-hero-actions">
               <a href="#work" className="mih-btn-outline">
                 View Work
               </a>
               <a
-                href="https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s"
+                href={SHOWREEL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mih-link-ghost"
@@ -760,13 +777,20 @@ export default function HomePage({ projects }: HomePageProps) {
           </a>
         ) : null}
 
-        <div className="mih-grid-cell mih-grid-tall">
-          <img
-            src={VARSHA_PHOTO}
-            alt="Varsha — Make It Here"
-            style={{ filter: "grayscale(25%)" }}
-          />
-        </div>
+        {gridFilms?.tall ? (
+          <a
+            href={gridFilms.tall.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mih-grid-cell mih-grid-tall"
+          >
+            <img
+              src={gridFilms.tall.src}
+              alt={gridFilms.tall.label}
+              style={{ filter: "grayscale(50%)" }}
+            />
+          </a>
+        ) : null}
 
         {gridFilms?.br ? (
           <a
@@ -833,18 +857,38 @@ export default function HomePage({ projects }: HomePageProps) {
 
       <section id="about" className="mih-section">
         <div className="mih-about-grid">
-          <div>
+          <div className="mih-about-media">
+            <img
+              className="mih-about-photo"
+              src={ABOUT_PHOTO}
+              alt="Varsha Desai — Make It Here"
+            />
+          </div>
+          <div className="mih-about-copy">
             <span className="mih-about-label">About</span>
             <h2 className="mih-about-quote">
-              Great brands are built on great stories. I make sure yours gets
-              told.
+              &lsquo;Make It Here&rsquo; is a creative platform by Varsha Desai.
+              She believes in bold moves like pineapple on pizzas.
             </h2>
             <p className="mih-about-p">
-              Make It Here is a video content studio founded by Varsha. We
-              create brand films, digital campaigns, and social content for
-              companies that want to cut through the noise. From India&apos;s
-              leading banks to healthcare groups, beauty brands, and food
-              companies — we&apos;ve told stories that matter, at scale.
+              She started out as a Copywriter with McCann as an unpaid Trainee
+              for about 2 years, on a salary that was at par with her
+              day-watchman. Her salary was finally at par with that of her night
+              watchman&apos;s after she joined Ogilvy where she spent a little
+              over thirteen years. Working with some of the finest minds and
+              create for brands like Cadburys, Dove, ICICI Bank, Welspun, Kodak,
+              Siemens, Ponds, Cipla, Breakthrough, to name a few.
+            </p>
+            <p className="mih-about-p">
+              In 2022, Varsha moved to Mullen as an Executive Creative Director,
+              handling work for their Mumbai and Bengaluru offices. Creating work
+              for Too Yum, Tata Tea, Manipal Healthcare, Fastrack, Medimix,
+              Havells, Motilal Oswal, Tata Cliq, Saffola, again, just to name a
+              few without putting you to sleep like her night watchman.
+            </p>
+            <p className="mih-about-p">
+              Varsha&apos;s, currently is writing about herself in the third
+              person. She finds this rather odd.
             </p>
           </div>
           <div className="mih-stats">

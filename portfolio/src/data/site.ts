@@ -1,11 +1,12 @@
-export const VARSHA_PHOTO =
-  "https://images.unsplash.com/photo-1547212371-eb5e6a4b590c?w=1200&h=900&fit=crop&auto=format&q=80";
+export const ABOUT_PHOTO = "/varsha.png";
+
+export const SHOWREEL_URL = "https://www.youtube.com/watch?v=OSSOWGKYsc4";
 
 export const NAV_LINKS = [
   { label: "Work", href: "#work" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
-  { label: "Showreel", href: "https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s", external: true },
+  { label: "Showreel", href: SHOWREEL_URL, external: true },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -24,15 +25,15 @@ export const STATS = [
 
 export const CONTACT_LINKS = [
   { label: "Email", value: "makeitherebyvarsha@gmail.com", href: "mailto:makeitherebyvarsha@gmail.com" },
-  { label: "YouTube", value: "Watch Showreel", href: "https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s" },
+  { label: "YouTube", value: "Watch Showreel", href: SHOWREEL_URL },
   { label: "Instagram", value: "@makeithere", href: "https://instagram.com/makeithere" },
-  { label: "LinkedIn", value: "Make It Here by Varsha", href: "https://linkedin.com/in/varsha" },
+  { label: "LinkedIn", value: "Make It Here by Varsha", href: "https://www.linkedin.com/in/varsha-desai-342820b9/" },
 ];
 
 export const FOOTER_LINKS = [
   { l: "Work", h: "#work" },
   { l: "About", h: "#about" },
   { l: "Services", h: "#services" },
-  { l: "Showreel", h: "https://www.youtube.com/watch?v=OSSOWGKYsc4&t=23s" },
+  { l: "Showreel", h: SHOWREEL_URL },
   { l: "Contact", h: "#contact" },
 ];
