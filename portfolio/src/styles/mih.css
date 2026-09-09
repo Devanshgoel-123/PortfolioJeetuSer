@@ -205,7 +205,7 @@ img {
   font-weight: 300;
   font-size: 0.82rem;
   line-height: 1.6;
-  color: var(--muted-foreground);
+  /* color: ); */
   max-width: min(640px, 100%);
   margin: 0;
 }
