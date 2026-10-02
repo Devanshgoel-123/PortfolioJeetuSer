@@ -648,22 +648,6 @@ export default function HomePage({ projects }: HomePageProps) {
           </div>
         ) : null}
 
-        <div className="mih-hero-dots">
-          {heroSlides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToSlide(i)}
-              className="mih-hero-dot"
-              style={{
-                width: i === heroSlide ? "20px" : "6px",
-                backgroundColor:
-                  i === heroSlide ? "var(--accent)" : "var(--border)",
-              }}
-              aria-label={`Slide ${i + 1}`}
-            />
-          ))}
-        </div>
-
         <div className="mih-hero-overlay" />
         <div className="mih-hero-watermark">26</div>
 
@@ -675,26 +659,37 @@ export default function HomePage({ projects }: HomePageProps) {
           </h1>
           <div className="mih-hero-main">
             <div className="mih-hero-copy">
+              <h2 className="mih-hero-sub">Attention is a currency.</h2>
               <p className="mih-hero-p">
-                Isn&apos;t an instruction. It isn&apos;t a request. It&apos;s a
-                platform. <br/>
-              {/* </p>
-              <p className="mih-hero-p"> */}
-                A space where brands come to build — through sharp strategy,
-                compelling ideas, and films designed for today&apos;s platforms.<br/>
-              {/* </p>
-              <p className="mih-hero-p"> */}
-                From brand strategy for film campaigns and digital ecosystems, to
-                full-scale brand campaigns, standalone films, promo scripts, award
-                show speeches, and influencer content — everything begins with a
-                platform-first mindset. Beyond that, &ldquo;Make It Here.&rdquo;
-                offers end-to-end execution: strategy, scripting, and production —
-                whether powered by AI or brought to life through traditional
-                shoots.<br/>
-              {/* </p>
-              <p className="mih-hero-p"> */}
-                Whatever your brand needs to express that big-brand energy — Make
-                It Here.
+                At <strong>Make It Here</strong>, the idea is to allow the
+                currency of attention for your brand. Attention that&apos;s not
+                defined by timesheets nor divided across 50 brands, with 20
+                people servicing it; but none championing it.
+              </p>
+              <p className="mih-hero-p">
+                Make It Here delivers a handmade experience for brands
+                that&apos;s created by carefully chosen like-minded Creatives,
+                Strategists, Account Management, Design and Production
+                specialists.
+              </p>
+              <p className="mih-hero-p">
+                Work that competes with all the content out there and wins.
+                Attention.
+              </p>
+              <p className="mih-hero-p mih-hero-p-break">
+                A brand becomes how it repeatedly shows up.
+              </p>
+              <p className="mih-hero-p">
+                <strong>Make It Here</strong> is here to help brands show up in
+                their Sunday-best. Even on a Monday.
+              </p>
+              <p className="mih-hero-p">
+                With attention. With care. With a very clear creative point of
+                view.
+              </p>
+              <p className="mih-hero-p">
+                So if you have a brand you really want to build or nurture-{" "}
+                <strong className="mih-hero-signoff">Make It Here.</strong>
               </p>
             </div>
             <div className="mih-hero-actions">
@@ -710,6 +705,21 @@ export default function HomePage({ projects }: HomePageProps) {
                 Watch Showreel
                 <ArrowUpRight />
               </a>
+              <div className="mih-hero-dots">
+                {heroSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goToSlide(i)}
+                    className="mih-hero-dot"
+                    style={{
+                      width: i === heroSlide ? "20px" : "6px",
+                      backgroundColor:
+                        i === heroSlide ? "var(--accent)" : "var(--border)",
+                    }}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -952,11 +962,10 @@ export default function HomePage({ projects }: HomePageProps) {
             </p>
           </div>
           <div className="mih-services-grid">
-            {SERVICES.map(({ no, title, desc }) => (
+            {SERVICES.map(({ no, title }) => (
               <div key={no} className="mih-service-card">
                 <div className="mih-service-no">{no}</div>
                 <h3 className="mih-service-title">{title}</h3>
-                <p className="mih-service-desc">{desc}</p>
               </div>
             ))}
           </div>

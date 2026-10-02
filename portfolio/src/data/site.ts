@@ -11,10 +11,16 @@ export const NAV_LINKS = [
 ];
 
 export const SERVICES = [
-  { no: "01", title: "Brand Films", desc: "Cinematic storytelling that puts your brand's purpose on screen — made to move and to last." },
-  { no: "02", title: "Campaign Production", desc: "End-to-end content for digital, TV, and social — from concept to final delivery." },
-  { no: "03", title: "Social Content", desc: "High-quality short-form content built for Instagram, YouTube, and beyond." },
-  { no: "04", title: "Documentaries", desc: "Long-form stories that build trust, community, and brand equity." },
+  { no: "01", title: "Brand Consultancy" },
+  { no: "02", title: "Fractional Creative Direction" },
+  { no: "03", title: "Films" },
+  { no: "04", title: "Branded Mini Series" },
+  { no: "05", title: "Strategy" },
+  { no: "06", title: "Documentaries" },
+  { no: "07", title: "Promos" },
+  { no: "08", title: "Design" },
+  { no: "09", title: "Brand Positioning" },
+  { no: "10", title: "Turnkey Production (AI and Traditional Shoots)" },
 ];
 
 export const STATS = [

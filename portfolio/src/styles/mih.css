@@ -130,7 +130,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 5rem var(--px) 4rem;
+  padding: 5rem var(--px) 1rem;
   position: relative;
   overflow: hidden;
 }
@@ -197,20 +197,42 @@ img {
 .mih-hero-copy {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.5rem;
+}
+
+.mih-hero-sub {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  margin: 0;
 }
 
 .mih-hero-p {
   font-family: "Inter", sans-serif;
   font-weight: 300;
   font-size: 0.82rem;
-  line-height: 1.6;
+  /* line-height: 1; */
   /* color: ); */
-  max-width: min(640px, 100%);
+  max-width: 100%;
   margin: 0;
 }
 
+.mih-hero-p-break {
+  margin-top: 1.25rem;
+}
+
+.mih-hero-p strong {
+  font-weight: 600;
+}
+
+.mih-hero-p .mih-hero-signoff {
+  font-weight: 700;
+  font-size: 1.15em;
+}
+
 .mih-hero-actions {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
@@ -899,11 +921,14 @@ img {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1px;
-  background-color: var(--border);
+  overflow: hidden;
 }
 
+/* Divider lines are drawn into the 1px gaps; the outer edges are clipped by
+   the grid, so empty cells in a short last row stay blank. */
 .mih-service-card {
   background-color: var(--card);
+  box-shadow: 1px 0 0 var(--border), 0 1px 0 var(--border);
   padding: 1.75rem 0;
   transition: background-color 0.2s;
 }
@@ -933,13 +958,6 @@ img {
   line-height: 1.2;
 }
 
-.mih-service-desc {
-  font-family: "Inter", sans-serif;
-  font-weight: 300;
-  font-size: 0.82rem;
-  line-height: 1.65;
-  color: var(--muted-foreground);
-}
 
 .mih-contact {
   background-color: var(--foreground);
@@ -1118,11 +1136,8 @@ img {
 }
 
 .mih-hero-dots {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
+  flex-basis: 100%;
+  justify-content: center;
   display: flex;
   gap: 6px;
   align-items: center;
@@ -1186,7 +1201,11 @@ img {
   }
 
   .mih-hero {
-    padding: 0 var(--px) 3.5rem;
+    padding: 0 var(--px) 1rem;
+  }
+
+  .mih-hero-h1 {
+    font-size: clamp(2.4rem, 11.2vw, 7.6rem);
   }
 
   .mih-section {
@@ -1263,7 +1282,7 @@ img {
 
   .mih-hero-p {
     font-size: 0.9rem;
-    line-height: 1.75;
+    /* line-height: 1.75; */
   }
 
   .mih-about-grid {
@@ -1384,5 +1403,12 @@ img {
 
   .mih-services-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .mih-hero-dots {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
