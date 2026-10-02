@@ -214,7 +214,7 @@ img {
   font-size: 0.82rem;
   /* line-height: 1; */
   /* color: ); */
-  max-width: 100%;
+  max-width: min(640px, 100%);
   margin: 0;
 }
 
@@ -1403,6 +1403,10 @@ img {
 
   .mih-services-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .mih-hero-p {
+    max-width: 50%;
   }
 
   .mih-hero-dots {
